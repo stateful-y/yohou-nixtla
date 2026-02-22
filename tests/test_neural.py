@@ -331,7 +331,9 @@ def _make_neural_forecaster(cls, **extra_kwargs):
         "max_steps": 5,
         # Use a unique temp directory so parallel xdist workers don't race on
         # the shared ``lightning_logs/version_N`` directory.
-        "trainer_kwargs": {"default_root_dir": tempfile.mkdtemp()},
+        # neuralforecast forwards unknown kwargs straight to pl.Trainer, so
+        # ``default_root_dir`` is passed at the top level, not nested.
+        "default_root_dir": tempfile.mkdtemp(),
     }
     # Per-model architecture reduction for faster tests.
     _model_defaults = {
