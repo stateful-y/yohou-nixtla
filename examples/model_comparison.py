@@ -1,7 +1,6 @@
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#     "marimo",
 #     "yohou",
 #     "yohou-nixtla",
 #     "polars>=0.20",
@@ -16,25 +15,52 @@ __generated_with = "0.13.0"
 app = marimo.App(width="medium")
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import marimo as mo
 
-    mo.md(
-        """
-        # Model Comparison: Stats vs Neural
-
-        Compare forecasters from both Nixtla backends on the same dataset.
-        """
-    )
     return (mo,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
-    import polars as pl
-    from yohou.datasets import load_air_passengers
+    import numpy as np
+    import plotly.graph_objects as go
 
+    from yohou.datasets import load_air_passengers
+    from yohou_nixtla.stats import AutoARIMAForecaster, AutoETSForecaster, SeasonalNaiveForecaster
+
+    return (AutoARIMAForecaster, AutoETSForecaster, SeasonalNaiveForecaster, go, load_air_passengers, np)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
+        r"""
+        # Model Comparison: Stats vs Neural
+
+        Compare forecasters from both Nixtla backends on the same dataset.
+
+        ## What You'll Learn
+
+        - How to use Yohou-Nixtla's unified `fit`/`predict` API across multiple Nixtla backends
+        - Comparing `SeasonalNaiveForecaster`, `AutoARIMAForecaster`, and `AutoETSForecaster`
+        - Evaluating forecast accuracy with MAE
+
+        ## Prerequisites
+
+        Basic familiarity with time series concepts (trend, seasonality) and the fit/predict pattern.
+        """
+    )
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"## 1. Load Data")
+
+
+@app.cell
+def _(load_air_passengers):
     y = load_air_passengers()
 
     # Split: train on first 120, test on last 24
@@ -42,21 +68,18 @@ def _():
     y_test = y[120:]
 
     target_col = [c for c in y.columns if c != "time"][0]
-    return (pl, target_col, y, y_test, y_train)
+    return (target_col, y, y_test, y_train)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
-    mo.md("## Fit forecasters from each backend")
+    mo.md(r"## 2. Fit Forecasters")
 
 
 @app.cell
-def _(y_train):
-    from yohou_nixtla.stats import AutoARIMAForecaster, AutoETSForecaster, SeasonalNaiveForecaster
-
+def _(AutoARIMAForecaster, AutoETSForecaster, SeasonalNaiveForecaster, y_train):
     h = 24
 
-    # Stats
     snaive = SeasonalNaiveForecaster(season_length=12)
     snaive.fit(y_train, forecasting_horizon=h)
     pred_snaive = snaive.predict()
@@ -72,10 +95,13 @@ def _(y_train):
     return (pred_arima, pred_ets, pred_snaive)
 
 
-@app.cell
-def _(pl, pred_arima, pred_ets, pred_snaive, target_col, y, y_test):
-    import plotly.graph_objects as go
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"## 3. Visualize Results")
 
+
+@app.cell
+def _(go, pred_arima, pred_ets, pred_snaive, target_col, y):
     fig = go.Figure()
 
     fig.add_trace(
@@ -113,10 +139,13 @@ def _(pl, pred_arima, pred_ets, pred_snaive, target_col, y, y_test):
     fig
 
 
-@app.cell
-def _(mo, pred_arima, pred_ets, pred_snaive, target_col, y_test):
-    import numpy as np
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"## 4. Evaluate")
 
+
+@app.cell
+def _(mo, np, pred_arima, pred_ets, pred_snaive, target_col, y_test):
     def mae(y_true, y_pred, col):
         """Compute mean absolute error."""
         truth = np.array(y_true[col].to_list())
@@ -130,8 +159,33 @@ def _(mo, pred_arima, pred_ets, pred_snaive, target_col, y_test):
     }
 
     mo.md(
-        "## Test MAE\n\n"
+        "### Test MAE\n\n"
         + "\n".join(f"- **{k}**: {v:.2f}" for k, v in results.items())
+    )
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
+        r"""
+        ## Key Takeaways
+
+        - **Unified API** -- Yohou-Nixtla provides the same `fit`/`predict` interface across all Nixtla backends
+        - **SeasonalNaive** serves as a simple baseline with no parameter tuning
+        - **AutoARIMA** and **AutoETS** automatically select the best model configuration
+        - All forecasters return Polars DataFrames with consistent column naming
+        """
+    )
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
+        r"""
+        ## Next Steps
+
+        - **Panel data**: See [Panel Data Forecasting](/examples/panel_data/) to forecast multiple related time series simultaneously
+        """
     )
 
 

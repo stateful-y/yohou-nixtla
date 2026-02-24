@@ -4,13 +4,13 @@ Learn Yohou-Nixtla through focused, interactive examples. Each notebook demonstr
 
 ## Getting Started
 
-### Model Comparison ([View](/examples/model_comparison/) | [Editable](/examples/model_comparison/edit/))
+### Model Comparison ([View](/examples/model_comparison/) | [Open in marimo](/examples/model_comparison/edit/))
 
 **Comparing Statistical and Neural Forecasters**
 
 Start here to see Yohou-Nixtla's unified API in action. This example fits an `AutoARIMAForecaster` and an `NBEATSForecaster` to the classic Air Passengers dataset, then visualizes their predictions side by side. You'll understand the strengths and trade-offs of each backend while using the same `fit`/`predict` interface throughout.
 
-### Panel Data ([View](/examples/panel_data/) | [Editable](/examples/panel_data/edit/))
+### Panel Data ([View](/examples/panel_data/) | [Open in marimo](/examples/panel_data/edit/))
 
 **Forecasting Multiple Related Time Series**
 
