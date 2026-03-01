@@ -116,7 +116,7 @@ class AutoETSForecaster(BaseStatsForecaster):
 
     See Also
     --------
-    ETSForecaster : ETS with manually specified parameters.
+    HoltWintersForecaster : ETS-style model with manually specified components.
     AutoARIMAForecaster : Automatic ARIMA model selection.
 
     Examples
@@ -482,6 +482,11 @@ class CrostonForecaster(BaseStatsForecaster):
         The fitted Nixtla orchestrator.
     instance_ : CrostonClassic
         The constructed Croston model instance.
+
+    See Also
+    --------
+    NaiveForecaster : Non-seasonal naive baseline.
+    SeasonalNaiveForecaster : Seasonal naive baseline.
 
     Examples
     --------

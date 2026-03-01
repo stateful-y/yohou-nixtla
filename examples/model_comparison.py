@@ -1,10 +1,10 @@
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
+#     "plotly>=5.19",
+#     "polars>=0.20",
 #     "yohou",
 #     "yohou-nixtla",
-#     "polars>=0.20",
-#     "plotly>=5.19",
 # ]
 # ///
 """Model comparison across statsforecast and neuralforecast."""
@@ -18,6 +18,12 @@ app = marimo.App(width="medium")
 @app.cell(hide_code=True)
 def _():
     import marimo as mo
+
+    __gallery__ = {
+        "title": "Model Comparison",
+        "description": "Compare statistical forecasters on the Air Passengers dataset using Yohou-Nixtla's unified API.",
+        "category": "Getting Started",
+    }
 
     return (mo,)
 
@@ -44,7 +50,7 @@ def _(mo):
         ## What You'll Learn
 
         - How to use Yohou-Nixtla's unified `fit`/`predict` API across multiple Nixtla backends
-        - Comparing `SeasonalNaiveForecaster`, `AutoARIMAForecaster`, and `AutoETSForecaster`
+        - Comparing [`SeasonalNaiveForecaster`](/pages/api/generated/yohou_nixtla.stats.SeasonalNaiveForecaster/), [`AutoARIMAForecaster`](/pages/api/generated/yohou_nixtla.stats.AutoARIMAForecaster/), and [`AutoETSForecaster`](/pages/api/generated/yohou_nixtla.stats.AutoETSForecaster/)
         - Evaluating forecast accuracy with MAE
 
         ## Prerequisites
@@ -56,7 +62,13 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"## 1. Load Data")
+    mo.md(
+        r"""
+        ## 1. Load Data
+
+        We use the classic Air Passengers dataset, splitting into 120 training observations and 24 test observations.
+        """
+    )
 
 
 @app.cell
@@ -73,7 +85,13 @@ def _(load_air_passengers):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"## 2. Fit Forecasters")
+    mo.md(
+        r"""
+        ## 2. Fit Forecasters
+
+        We fit three statistical forecasters using the same `fit`/`predict` interface: [`SeasonalNaiveForecaster`](/pages/api/generated/yohou_nixtla.stats.SeasonalNaiveForecaster/), [`AutoARIMAForecaster`](/pages/api/generated/yohou_nixtla.stats.AutoARIMAForecaster/), and [`AutoETSForecaster`](/pages/api/generated/yohou_nixtla.stats.AutoETSForecaster/).
+        """
+    )
 
 
 @app.cell
@@ -97,7 +115,13 @@ def _(AutoARIMAForecaster, AutoETSForecaster, SeasonalNaiveForecaster, y_train):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"## 3. Visualize Results")
+    mo.md(
+        r"""
+        ## 3. Visualize Results
+
+        Plot actual values alongside forecasts from each model to visually compare their predictions.
+        """
+    )
 
 
 @app.cell
@@ -141,7 +165,13 @@ def _(go, pred_arima, pred_ets, pred_snaive, target_col, y):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"## 4. Evaluate")
+    mo.md(
+        r"""
+        ## 4. Evaluate
+
+        Compute Mean Absolute Error (MAE) on the held-out test set to quantify forecast accuracy.
+        """
+    )
 
 
 @app.cell
@@ -184,7 +214,7 @@ def _(mo):
         r"""
         ## Next Steps
 
-        - **Panel data**: See [Panel Data Forecasting](/examples/panel_data/) to forecast multiple related time series simultaneously
+        - **Panel data**: See [`panel_data.py`](/examples/panel_data/) to forecast multiple related time series simultaneously
         """
     )
 

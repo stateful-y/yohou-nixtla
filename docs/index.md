@@ -67,8 +67,8 @@ In-depth documentation on the design, architecture, and core concepts.
 
 Interactive notebooks demonstrating real-world usage.
 
-- [Model Comparison](pages/examples.md#example-1-model-comparison)
-- [Panel Data Forecasting](pages/examples.md#example-2-panel-data-forecasting)
+- [Model Comparison](pages/examples.md)
+- [Panel Data Forecasting](pages/examples.md)
 
 ### [API Reference](pages/api-reference.md)
 

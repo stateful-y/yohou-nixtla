@@ -159,6 +159,11 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
         self
             Fitted forecaster.
 
+        Raises
+        ------
+        ValueError
+            If ``forecasting_horizon < 1``.
+
         """
         if forecasting_horizon < 1:
             raise ValueError(f"forecasting_horizon must be a positive integer, got {forecasting_horizon}.")

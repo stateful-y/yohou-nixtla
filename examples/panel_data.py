@@ -1,11 +1,11 @@
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
+#     "numpy>=2.0",
+#     "plotly>=5.19",
+#     "polars>=0.20",
 #     "yohou",
 #     "yohou-nixtla",
-#     "polars>=0.20",
-#     "plotly>=5.19",
-#     "numpy>=2.0",
 # ]
 # ///
 """Panel data forecasting with Nixtla wrappers."""
@@ -19,6 +19,12 @@ app = marimo.App(width="medium")
 @app.cell(hide_code=True)
 def _():
     import marimo as mo
+
+    __gallery__ = {
+        "title": "Panel Data Forecasting",
+        "description": "Forecast multiple related time series simultaneously using the panel column naming convention.",
+        "category": "Getting Started",
+    }
 
     return (mo,)
 
@@ -54,14 +60,20 @@ def _(mo):
 
         ## Prerequisites
 
-        Basic familiarity with Yohou-Nixtla's fit/predict API. See [Model Comparison](/examples/model_comparison/) for an introduction.
+        Basic familiarity with Yohou-Nixtla's fit/predict API. See [`model_comparison.py`](/examples/model_comparison/) for an introduction.
         """
     )
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"## 1. Generate Panel Data")
+    mo.md(
+        r"""
+        ## 1. Generate Panel Data
+
+        Create a synthetic dataset with two store-level time series using the `__` column naming convention (e.g. `sales__store_A`).
+        """
+    )
 
 
 @app.cell
@@ -90,7 +102,13 @@ def _(datetime, np, pl, timedelta):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"## 2. Fit and Predict")
+    mo.md(
+        r"""
+        ## 2. Fit and Predict
+
+        Fit a single [`NaiveForecaster`](/pages/api/generated/yohou_nixtla.stats.NaiveForecaster/) to all panel groups at once. The forecaster automatically handles per-group fitting and prediction.
+        """
+    )
 
 
 @app.cell
@@ -104,7 +122,13 @@ def _(NaiveForecaster, y):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"## 3. Visualize Results")
+    mo.md(
+        r"""
+        ## 3. Visualize Results
+
+        Plot actual and forecasted values side by side for each store to compare predictions per group.
+        """
+    )
 
 
 @app.cell
@@ -153,7 +177,7 @@ def _(mo):
         r"""
         ## Next Steps
 
-        - **Model comparison**: See [Model Comparison](/examples/model_comparison/) to compare statistical and neural forecasters side by side
+        - **Model comparison**: See [`model_comparison.py`](/examples/model_comparison/) to compare statistical and neural forecasters side by side
         """
     )
 

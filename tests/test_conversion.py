@@ -300,7 +300,8 @@ class TestNixtlaToYohou:
             "model": [1.0, 2.0],
         })
         # Request both "a" (exists) and "nonexistent" (doesn't exist)
-        result = nixtla_to_yohou(forecast, y_columns=["a", "nonexistent"])
+        with pytest.warns(UserWarning, match="nonexistent"):
+            result = nixtla_to_yohou(forecast, y_columns=["a", "nonexistent"])
 
         # Only "a" should be in result, "nonexistent" is skipped
         assert list(result.columns) == ["time", "a"]
