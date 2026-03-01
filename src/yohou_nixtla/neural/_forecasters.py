@@ -48,6 +48,12 @@ class NBEATSForecaster(BaseNeuralForecaster):
     --------
     NHITSForecaster : Hierarchical interpolation variant.
 
+    References
+    ----------
+    .. [1] B. N. Oreshkin, D. Carpov, N. Chapados, and Y. Bengio,
+       "N-BEATS: Neural basis expansion analysis for interpretable time
+       series forecasting," ICLR, 2020.
+
     Examples
     --------
     >>> from yohou_nixtla.neural import NBEATSForecaster
@@ -96,6 +102,13 @@ class NHITSForecaster(BaseNeuralForecaster):
     --------
     NBEATSForecaster : Neural basis expansion variant.
 
+    References
+    ----------
+    .. [1] C. Challu, K. G. Olivares, B. N. Oreshkin, F. Garza,
+       M. Mergenthaler-Canseco, and A. Dubrawski, "N-HiTS: Neural
+       hierarchical interpolation for time series forecasting,"
+       AAAI, 2023.
+
     Examples
     --------
     >>> from yohou_nixtla.neural import NHITSForecaster
@@ -137,6 +150,11 @@ class MLPForecaster(BaseNeuralForecaster):
         The fitted NeuralForecast orchestrator.
     instance_ : MLP
         The constructed MLP model instance.
+
+    See Also
+    --------
+    NBEATSForecaster : Neural basis expansion architecture.
+    NHITSForecaster : Hierarchical interpolation variant.
 
     Examples
     --------
@@ -180,6 +198,17 @@ class PatchTSTForecaster(BaseNeuralForecaster):
         The fitted NeuralForecast orchestrator.
     instance_ : PatchTST
         The constructed PatchTST model instance.
+
+    See Also
+    --------
+    TimesNetForecaster : Temporal 2D-variation modeling.
+    NBEATSForecaster : Neural basis expansion architecture.
+
+    References
+    ----------
+    .. [1] Y. Nie, N. H. Nguyen, P. Sinthong, and J. Kalagnanam,
+       "A time series is worth 64 words: Long-term forecasting with
+       transformers," ICLR, 2023.
 
     Examples
     --------
@@ -230,6 +259,17 @@ class TimesNetForecaster(BaseNeuralForecaster):
         The fitted NeuralForecast orchestrator.
     instance_ : TimesNet
         The constructed TimesNet model instance.
+
+    See Also
+    --------
+    PatchTSTForecaster : Patch-based transformer architecture.
+    NBEATSForecaster : Neural basis expansion architecture.
+
+    References
+    ----------
+    .. [1] H. Wu, T. Hu, Y. Liu, H. Zhou, J. Wang, and M. Long,
+       "TimesNet: Temporal 2D-variation modeling for general time
+       series analysis," ICLR, 2023.
 
     Examples
     --------
