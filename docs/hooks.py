@@ -1003,10 +1003,10 @@ def on_page_markdown(markdown, page, config, files):
         gallery_html = _build_gallery_html(project_root)
         markdown = markdown.replace("<!-- GALLERY -->", gallery_html)
 
-    # Resolve [Open in marimo] placeholder URLs → full marimo.app playground URLs
+    # Resolve any /examples/…/edit/ links → full marimo.app playground URLs
     markdown = re.sub(
-        r"\[Open in marimo\]\(/examples/([^)]+?)/edit/\)",
-        rf"[Open in marimo]({playground_base}/examples/\1.py)",
+        r"\[([^\]]+)\]\(/examples/([^)]+?)/edit/\)",
+        rf"[\1]({playground_base}/examples/\2.py)",
         markdown,
     )
 
