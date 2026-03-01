@@ -55,4 +55,3 @@ repos:
         types: [python]
         files: ^src/
         pass_filenames: false
-
