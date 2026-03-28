@@ -1,4 +1,4 @@
-# User Guide
+# Concepts
 
 This guide provides comprehensive documentation for Yohou-Nixtla.
 
@@ -23,30 +23,6 @@ Learn more: [Yohou Documentation](https://yohou.readthedocs.io/)
 Nixtla provides open-source forecasting libraries: StatsForecast (classical statistics) and NeuralForecast (deep learning). Yohou-Nixtla wraps models from both backends.
 
 Learn more: [Nixtla Documentation](https://nixtla.io/)
-
-## Why Yohou-Nixtla?
-
-Nixtla's libraries are powerful but operate on pandas DataFrames in long format with their own API conventions. Yohou-Nixtla solves three problems:
-
-1. **Unified API**: Use the same `fit`/`predict`/`observe`/`rewind` interface regardless of whether you're running an ARIMA model or a neural network.
-2. **Polars-native**: Work with polars DataFrames end-to-end. The conversion to/from Nixtla's pandas format happens automatically under the hood.
-3. **Scikit-learn compatibility**: All forecasters support `clone()`, `get_params()`, `set_params()`, and integrate with Yohou's cross-validation, hyperparameter search, and scoring utilities.
-
-### For Yohou Users
-
-If you're already using Yohou and want access to Nixtla's model zoo, Yohou-Nixtla offers:
-
-- **Drop-in forecasters**: Use `AutoARIMAForecaster` or `NBEATSForecaster` exactly like any other Yohou forecaster: same API, same data format, same workflow.
-- **Composability**: Combine Nixtla forecasters with Yohou's `DecompositionPipeline`, `ColumnForecaster`, `GridSearchCV`, and other meta-estimators.
-- **Panel data support**: Nixtla's native multi-series handling is exposed through Yohou's `__` column naming convention.
-
-### For Nixtla Users
-
-If you're familiar with Nixtla libraries and want sklearn integration, you'll appreciate:
-
-- **Familiar models**: The same AutoARIMA, NBEATS, NHITS, and other models you know, just wrapped in a consistent interface.
-- **Incremental updates**: Use `observe()` to add new observations without refitting, and `rewind()` to manage the observation window.
-- **Ecosystem integration**: Plug Nixtla models into sklearn pipelines, cross-validation, and hyperparameter optimization.
 
 ## Core Concepts
 
@@ -213,9 +189,8 @@ No. Install only the backend you need: `statsforecast` for Stats or `neuralforec
 
 When `freq=None` (the default), the forecaster calls `infer_freq(y)` at fit time to detect the time interval from the polars DataFrame's `"time"` column. You can override this by setting `freq` explicitly (e.g., `freq="MS"` for monthly data).
 
-## Next Steps
+## See Also
 
-- **Try it out**: Follow the [Getting Started](getting-started.md) guide
-- **See examples**: Explore the [Examples](examples.md) page
-- **Browse the API**: Check the [API Reference](api-reference.md) for all classes
-- **Contribute**: Read the [Contributing Guide](contributing.md)
+- [Getting Started](../tutorials/getting-started.md) - install and first example
+- [Examples](../tutorials/examples.md) - interactive example notebooks
+- [API Reference](../reference/api.md) - detailed API documentation

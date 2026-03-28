@@ -131,7 +131,7 @@ Or run locally:
 
 Now that you have Yohou-Nixtla installed and running:
 
-- **Learn the concepts**: Read the [User Guide](user-guide.md) to understand the forecasting backends, data conversion, and panel data support
+- **Learn the concepts**: Read the [Concepts](../explanation/concepts.md) to understand the forecasting backends, data conversion, and panel data support
 - **Explore examples**: Check out the [Examples](examples.md) for interactive demonstrations
-- **Dive into the API**: Browse the [API Reference](api-reference.md) for detailed documentation on all forecaster classes
+- **Dive into the API**: Browse the [API Reference](../reference/api.md) for detailed documentation on all forecaster classes
 - **Get help**: Visit [GitHub Discussions](https://github.com/stateful-y/yohou-nixtla/discussions) or [open an issue](https://github.com/stateful-y/yohou-nixtla/issues)

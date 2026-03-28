@@ -17,7 +17,7 @@ Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast*
 
     Install → Fit → Predict → Done
 
-    [Getting Started](pages/getting-started.md)
+    [Getting Started](pages/tutorials/getting-started.md)
 
 - **Learn the Concepts**
 
@@ -25,7 +25,7 @@ Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast*
 
     Understand the forecasting backends, data conversion, and panel data
 
-    [User Guide](pages/user-guide.md)
+    [Concepts](pages/explanation/concepts.md)
 
 - **See It In Action**
 
@@ -33,7 +33,7 @@ Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast*
 
     Compare statistical and neural forecasters on real data
 
-    [Examples](pages/examples.md)
+    [Examples](pages/tutorials/examples.md)
 
 - **API Reference**
 
@@ -41,36 +41,36 @@ Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast*
 
     Complete reference for all forecaster classes and conversion utilities
 
-    [API Reference](pages/api-reference.md)
+    [API Reference](pages/reference/api.md)
 
 </div>
 
 ## Table of Contents
 
-### [Getting Started](pages/getting-started.md)
+### [Getting Started](pages/tutorials/getting-started.md)
 
 Step-by-step guide to installing and using Yohou-Nixtla.
 
-- [Installation](pages/getting-started.md#installation)
-- [Basic Usage](pages/getting-started.md#basic-usage)
-- [Complete Example](pages/getting-started.md#complete-example)
+- [Installation](pages/tutorials/getting-started.md#installation)
+- [Basic Usage](pages/tutorials/getting-started.md#basic-usage)
+- [Complete Example](pages/tutorials/getting-started.md#complete-example)
 
-### [User Guide](pages/user-guide.md)
+### [Concepts](pages/explanation/concepts.md)
 
 In-depth documentation on the design, architecture, and core concepts.
 
-- [Core Concepts](pages/user-guide.md#core-concepts)
-- [Key Features](pages/user-guide.md#key-features)
-- [Best Practices](pages/user-guide.md#best-practices)
+- [Core Concepts](pages/explanation/concepts.md#core-concepts)
+- [Key Features](pages/explanation/concepts.md#key-features)
+- [Best Practices](pages/explanation/concepts.md#best-practices)
 
-### [Examples](pages/examples.md)
+### [Examples](pages/tutorials/examples.md)
 
 Interactive notebooks demonstrating real-world usage.
 
-- [Model Comparison](pages/examples.md)
-- [Panel Data Forecasting](pages/examples.md)
+- [Model Comparison](pages/tutorials/examples.md)
+- [Panel Data Forecasting](pages/tutorials/examples.md)
 
-### [API Reference](pages/api-reference.md)
+### [API Reference](pages/reference/api.md)
 
 Detailed reference for the Yohou-Nixtla API, including all forecaster classes and conversion utilities.
 
