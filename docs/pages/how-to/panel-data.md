@@ -10,12 +10,9 @@ Yohou-Nixtla's panel data convention.
 
 ## How Panel Data Works
 
-Yohou uses the `__` separator in column names to signal panel (grouped) data. A
-column named `sales__store_1` means: feature `sales`, group `store_1`.
-
-All Yohou-Nixtla forecasters detect this convention automatically. Each group
-is fitted independently by Nixtla and the results are recombined into wide
-format.
+Yohou uses the `__` separator in column names to signal panel (grouped) data
+(e.g., `sales__store_1`). All Yohou-Nixtla forecasters detect this convention
+automatically. See [Concepts](../explanation/concepts.md#panel-data) for details.
 
 ## Steps
 

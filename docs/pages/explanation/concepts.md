@@ -1,28 +1,6 @@
-# Concepts
+# About Yohou-Nixtla
 
-This guide provides comprehensive documentation for Yohou-Nixtla.
-
-## Overview
-
-Yohou-Nixtla is a bridge between the [Yohou](https://github.com/stateful-y/yohou) time series forecasting framework and the [Nixtla](https://nixtla.io/) ecosystem. It wraps Nixtla's forecasting libraries (**StatsForecast** and **NeuralForecast**) as Yohou-compatible forecasters, so you get the best of both worlds: Nixtla's state-of-the-art models with Yohou's scikit-learn-compatible API.
-
-Every forecaster in this package uses dual inheritance: it inherits from both `BaseClassWrapper` (for seamless sklearn `clone`/`get_params`/`set_params` support) and `BasePointForecaster` (for Yohou's `fit`/`predict`/`observe`/`rewind` lifecycle). Data is automatically converted between Yohou's polars wide-format and Nixtla's pandas long-format via the built-in conversion utilities.
-
-## Prerequisites
-
-Before diving into Yohou-Nixtla, it's helpful to understand:
-
-### Yohou
-
-Yohou is a scikit-learn-compatible time series forecasting framework built on polars. It provides the `BasePointForecaster` API that all Yohou-Nixtla forecasters inherit from, including `fit`, `predict`, `observe`, and `rewind` methods.
-
-Learn more: [Yohou Documentation](https://yohou.readthedocs.io/)
-
-### Nixtla
-
-Nixtla provides open-source forecasting libraries: StatsForecast (classical statistics) and NeuralForecast (deep learning). Yohou-Nixtla wraps models from both backends.
-
-Learn more: [Nixtla Documentation](https://nixtla.io/)
+Yohou-Nixtla bridges the [Yohou](https://github.com/stateful-y/yohou) time series forecasting framework and the [Nixtla](https://nixtla.io/) ecosystem. It wraps Nixtla's forecasting libraries (**StatsForecast** and **NeuralForecast**) as Yohou-compatible forecasters, so you get Nixtla's state-of-the-art models with Yohou's scikit-learn-compatible API.
 
 ## Core Concepts
 
@@ -78,92 +56,19 @@ Each group (e.g., `store_1`, `store_2`) is modeled independently by Nixtla, and 
 !!! example "Interactive Example"
     See [**Panel Data**](/examples/panel_data/) ([View](/examples/panel_data/) | [Editable](/examples/panel_data/edit/)) for a hands-on walkthrough of multi-series forecasting with the `__` convention.
 
-## Key Features
+## Design Decisions
 
-### 1. Unified Fit/Predict Interface
+### Dual Inheritance
 
-All forecasters share the same API:
+Every forecaster inherits from both `BaseClassWrapper` (for seamless sklearn `clone`/`get_params`/`set_params` support) and `BasePointForecaster` (for Yohou's `fit`/`predict`/`observe`/`rewind` lifecycle). This means forecasters work natively with both Yohou pipelines and sklearn meta-estimators like `GridSearchCV`.
 
-```python
-forecaster.fit(y, forecasting_horizon=12)      # Train
-y_pred = forecaster.predict(forecasting_horizon=12)  # Forecast
-forecaster.observe(y_new)                       # Add observations
-forecaster.rewind(y)                            # Rewind state
-```
+### Automatic Data Conversion
 
-### 2. Automatic Frequency Detection
+Yohou uses polars wide-format DataFrames; Nixtla expects pandas long-format. Rather than forcing users to convert manually, every `fit` and `predict` call converts data transparently through the `_conversion` module. The trade-off is a small polars-to-pandas overhead per call, but it keeps the user-facing API clean.
 
-The `infer_freq` utility automatically maps polars time intervals to Nixtla-compatible frequency strings. Supported intervals include seconds, minutes, hours, days, weeks, months, quarters, and years.
+### The `__` Convention for Panel Data
 
-### 3. Exogenous Feature Support
-
-Neural forecasters accept exogenous features (`X`) alongside the target (`y`):
-
-```python
-forecaster = NBEATSForecaster(input_size=24, max_steps=100)
-forecaster.fit(y, X=X_train, forecasting_horizon=12)
-y_pred = forecaster.predict(X=X_test, forecasting_horizon=12)
-```
-
-### 4. Scikit-learn Metadata Routing
-
-All forecasters support sklearn's metadata routing, enabling integration with Yohou's `GridSearchCV`, `RandomizedSearchCV`, and other meta-estimators.
-
-### 5. Clone and Parameter Management
-
-Every forecaster supports `clone()`, `get_params(deep=True)`, and `set_params()` for hyperparameter search compatibility:
-
-```python
-from sklearn.base import clone
-
-original = AutoARIMAForecaster(season_length=12, max_p=5)
-cloned = clone(original)  # Independent copy with same parameters
-```
-
-### 6. Parallel Execution
-
-Stats forecasters support parallel execution via the `n_jobs` parameter for multi-series data.
-
-## Configuration
-
-### Stats Forecasters
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `season_length` | int | 1 | Length of the seasonal period |
-| `freq` | str \| None | None | Frequency string (auto-detected if None) |
-| `n_jobs` | int | 1 | Number of parallel jobs |
-
-### Neural Forecasters
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `input_size` | int | 24 | Number of input time steps |
-| `max_steps` | int | 100 | Maximum training steps |
-| `freq` | str \| None | None | Frequency string (auto-detected if None) |
-
-## Best Practices
-
-### 1. Choose the Right Backend
-
-- Start with **Stats** forecasters (e.g., `AutoARIMAForecaster`) for quick baselines. They're fast and require minimal configuration.
-- Use **Neural** forecasters for large-scale datasets or when classical methods underperform.
-
-### 2. Set Season Length Correctly
-
-For Stats forecasters, `season_length` is critical. Common values:
-
-- Daily data with weekly seasonality: `season_length=7`
-- Monthly data with yearly seasonality: `season_length=12`
-- Hourly data with daily seasonality: `season_length=24`
-
-### 3. Use Observe for Streaming Scenarios
-
-Call `observe()` instead of `refit()` when new observations arrive. This appends to the internal observation buffer without retraining the model, which is much faster for online/streaming use cases.
-
-### 4. Leverage Panel Data
-
-When forecasting many related time series, use Yohou's `__` column convention to fit all series at once. This is more efficient than fitting separate forecasters and enables Nixtla's native multi-series optimizations.
+Yohou encodes panel structure in column names using the `__` separator (e.g., `sales__store_1`). This avoids needing a separate index or groupby column and keeps everything in a single flat DataFrame. Yohou-Nixtla maps these groups to Nixtla's `unique_id` column automatically.
 
 ## Limitations and Considerations
 
@@ -174,20 +79,6 @@ When forecasting many related time series, use Yohou's `__` column convention to
 3. **Neural forecaster dependencies**: Neural forecasters require PyTorch and `neuralforecast`, which are large dependencies. Install them separately if not needed.
 
 4. **No custom model wrapping**: The current release provides a fixed set of 20 wrapped models. Custom Nixtla models require subclassing a base forecaster.
-
-## FAQ
-
-### Can I use Nixtla forecasters in a Yohou pipeline?
-
-Yes. All Yohou-Nixtla forecasters are fully compatible with `DecompositionPipeline`, `ColumnForecaster`, `ForecastedFeatureForecaster`, and other Yohou meta-estimators.
-
-### Do I need to install both Nixtla backends?
-
-No. Install only the backend you need: `statsforecast` for Stats or `neuralforecast` for Neural forecasters.
-
-### How does frequency detection work?
-
-When `freq=None` (the default), the forecaster calls `infer_freq(y)` at fit time to detect the time interval from the polars DataFrame's `"time"` column. You can override this by setting `freq` explicitly (e.g., `freq="MS"` for monthly data).
 
 ## See Also
 

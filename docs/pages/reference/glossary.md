@@ -87,18 +87,9 @@ Reference terms and definitions for Yohou-Nixtla.
 
 **`infer_freq(y)`**
 : Utility function that maps polars interval strings to Nixtla frequency
-  aliases. Called automatically at fit time when `freq=None`.
-
-| Polars interval | Nixtla alias | Meaning |
-|-----------------|-------------|---------|
-| `1s` | `"s"` | Secondly |
-| `1m` | `"min"` | Minutely |
-| `1h` | `"H"` | Hourly |
-| `1d` | `"D"` | Daily |
-| `1w` | `"W"` | Weekly |
-| `1mo` | `"MS"` | Monthly (month start) |
-| `3mo` | `"QS"` | Quarterly |
-| `1y` | `"YS"` | Annual |
+  aliases. Called automatically at fit time when `freq=None`. See the
+  [Configuration guide](../how-to/configure.md) for a full table of
+  frequency mappings.
 
 ## Parameters
 

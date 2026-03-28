@@ -158,6 +158,18 @@ forecaster.fit(y, forecasting_horizon=12)
 y_pred = forecaster.predict(forecasting_horizon=12)
 ```
 
+## Common Questions
+
+### Can I use Nixtla forecasters in a Yohou pipeline?
+
+Yes. All Yohou-Nixtla forecasters are fully compatible with `DecompositionPipeline`,
+`ColumnForecaster`, `ForecastedFeatureForecaster`, and other Yohou meta-estimators.
+
+### Do I need to install both Nixtla backends?
+
+No. Install only the backend you need: `statsforecast` for Stats or
+`neuralforecast` for Neural forecasters.
+
 ## Getting More Help
 
 - [Open an issue](https://github.com/stateful-y/yohou-nixtla/issues/new) - include

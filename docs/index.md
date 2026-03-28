@@ -15,9 +15,15 @@ Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast*
 
     Install Yohou-Nixtla and produce your first forecast
 
-    Install → Fit → Predict → Done
-
     [Getting Started](pages/tutorials/getting-started.md)
+
+- **Need Help?**
+
+    ---
+
+    Find answers to common questions and troubleshooting tips.
+
+    [Troubleshooting](pages/how-to/troubleshooting.md)
 
 - **Learn the Concepts**
 
@@ -35,45 +41,30 @@ Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast*
 
     [Examples](pages/tutorials/examples.md)
 
-- **API Reference**
-
-    ---
-
-    Complete reference for all forecaster classes and conversion utilities
-
-    [API Reference](pages/reference/api.md)
-
 </div>
 
 ## Table of Contents
 
 ### [Getting Started](pages/tutorials/getting-started.md)
 
-Step-by-step guide to installing and using Yohou-Nixtla.
-
-- [Installation](pages/tutorials/getting-started.md#installation)
-- [Basic Usage](pages/tutorials/getting-started.md#basic-usage)
-- [Complete Example](pages/tutorials/getting-started.md#complete-example)
+Install Yohou-Nixtla and produce your first forecast.
 
 ### [Concepts](pages/explanation/concepts.md)
 
-In-depth documentation on the design, architecture, and core concepts.
-
-- [Core Concepts](pages/explanation/concepts.md#core-concepts)
-- [Key Features](pages/explanation/concepts.md#key-features)
-- [Best Practices](pages/explanation/concepts.md#best-practices)
+Design, architecture, and core ideas behind Yohou-Nixtla.
 
 ### [Examples](pages/tutorials/examples.md)
 
 Interactive notebooks demonstrating real-world usage.
 
-- [Model Comparison](pages/tutorials/examples.md)
-- [Panel Data Forecasting](pages/tutorials/examples.md)
+### [Configuration](pages/how-to/configure.md)
+
+Set up and customize forecasters for your project.
 
 ### [API Reference](pages/reference/api.md)
 
-Detailed reference for the Yohou-Nixtla API, including all forecaster classes and conversion utilities.
+Complete API reference - classes, functions, and options.
 
 ## License
 
-Yohou-Nixtla is open source and licensed under the [Apache-2.0 License](https://opensource.org/licenses/Apache-2.0). You are free to use, modify, and distribute this software under the terms of this license.
+Yohou-Nixtla is open source and licensed under the [Apache-2.0 License](https://opensource.org/licenses/Apache-2.0).

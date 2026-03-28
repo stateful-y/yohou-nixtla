@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide will help you install and start using Yohou-Nixtla in minutes.
+In this tutorial, we will install Yohou-Nixtla and produce a first forecast.
 
 ## Installation
 
