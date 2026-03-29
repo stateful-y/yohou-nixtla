@@ -7,11 +7,6 @@ into your forecasts.
 
 - Yohou-Nixtla installed ([Getting Started](../tutorials/getting-started.md))
 - Feature data aligned with your target time series
-
-## Prerequisites
-
-- Yohou-Nixtla installed ([Getting Started](../tutorials/getting-started.md))
-- Feature data aligned with your target time series
 - A **neural forecaster** - only neural forecasters use exogenous features at
   prediction time. Stats forecasters accept `X` in `fit` but ignore it during
   prediction.
