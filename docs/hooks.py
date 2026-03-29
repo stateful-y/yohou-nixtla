@@ -1037,9 +1037,9 @@ def on_pre_build(config):
     # Generate per-submodule API reference pages
     _generate_api_pages(project_root)
 
-    # Allow skipping slow notebook export during development
-    if os.environ.get("MKDOCS_SKIP_NOTEBOOKS"):
-        print("[hooks] MKDOCS_SKIP_NOTEBOOKS set, skipping notebook export")
+    # Allow skipping slow notebook export during development or on RTD
+    if os.environ.get("MKDOCS_SKIP_NOTEBOOKS") or os.environ.get("READTHEDOCS"):
+        print("[hooks] skipping notebook export (MKDOCS_SKIP_NOTEBOOKS or READTHEDOCS set)")
         return
 
     examples_dir = project_root / "examples"
