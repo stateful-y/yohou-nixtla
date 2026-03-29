@@ -8,15 +8,13 @@ into your forecasts.
 - Yohou-Nixtla installed ([Getting Started](../tutorials/getting-started.md))
 - Feature data aligned with your target time series
 
-## Which Forecasters Support Exogenous Features
+## Prerequisites
 
-Only **neural forecasters** use exogenous features at prediction time. Stats
-forecasters accept `X` in `fit` but do not use it during prediction.
-
-| Forecaster type | `X` in `fit` | `X` in `predict` |
-|-----------------|--------------|------------------|
-| Stats (AutoARIMA, AutoETS, etc.) | Accepted (ignored) | Not used |
-| Neural (NBEATS, NHITS, MLP, etc.) | Used | Required |
+- Yohou-Nixtla installed ([Getting Started](../tutorials/getting-started.md))
+- Feature data aligned with your target time series
+- A **neural forecaster** - only neural forecasters use exogenous features at
+  prediction time. Stats forecasters accept `X` in `fit` but ignore it during
+  prediction.
 
 ## Steps
 

@@ -8,8 +8,6 @@ Yohou-Nixtla's panel data convention.
 - Yohou-Nixtla installed ([Getting Started](../tutorials/getting-started.md))
 - A polars DataFrame with a `time` column
 
-## How Panel Data Works
-
 Yohou uses the `__` separator in column names to signal panel (grouped) data
 (e.g., `sales__store_1`). All Yohou-Nixtla forecasters detect this convention
 automatically. See [Concepts](../explanation/concepts.md#panel-data) for details.
