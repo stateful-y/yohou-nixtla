@@ -1,6 +1,6 @@
 # Examples
 
-Explore Yohou-Nixtla through interactive example notebooks.
+Interactive notebooks grouped by purpose: **Tutorials** walk through a topic step-by-step, while **How-to Guides** solve a specific task.
 
 <!-- GALLERY -->
 
