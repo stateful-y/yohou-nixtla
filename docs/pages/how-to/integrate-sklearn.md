@@ -11,8 +11,8 @@ introspection and hyperparameter search utilities.
 ## Clone a Forecaster
 
 All forecasters are compatible with `sklearn.base.clone`. This produces an
-unfitted copy with the same hyperparameters - used internally by cross-validation
-and search utilities:
+unfitted copy with the same hyperparameters, which cross-validation
+and search utilities use internally:
 
 ```python
 from sklearn.base import clone
@@ -44,8 +44,8 @@ forecaster.set_params(season_length=4)
 
 ## Hyperparameter Search with Yohou's GridSearchCV
 
-Use Yohou's `GridSearchCV` rather than sklearn's - it wraps the `fit`/`predict`
-lifecycle correctly for time series cross-validation:
+Use Yohou's `GridSearchCV` rather than sklearn's because it wraps the
+`fit`/`predict` lifecycle correctly for time series cross-validation:
 
 ```python
 from yohou.model_selection import GridSearchCV
@@ -94,6 +94,6 @@ search.fit(y, forecasting_horizon=12)
 
 ## See Also
 
-- [Concepts](../explanation/concepts.md) - understand the sklearn compatibility design
-- [How to Configure Forecasters](configure.md) - all available parameters for each forecaster
-- [API Reference](../reference/api.md) - `fit`, `predict`, `get_params`, `set_params` signatures
+- [Concepts](../explanation/concepts.md): sklearn compatibility design
+- [How to Configure Forecasters](configure.md): all available parameters for each forecaster
+- [API Reference](../reference/api.md): `fit`, `predict`, `get_params`, `set_params` signatures

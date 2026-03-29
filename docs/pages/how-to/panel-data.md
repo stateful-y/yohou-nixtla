@@ -47,7 +47,7 @@ timestamps; all other columns are treated as separate series.
 
 ### 2. Fit the forecaster
 
-Fit exactly as you would for a single series - the panel structure is handled
+Fit exactly as you would for a single series. The panel structure is handled
 automatically:
 
 ```python
@@ -108,6 +108,6 @@ Null rows at the beginning of a series are dropped before fitting.
 
 ## See Also
 
-- [Concepts](../explanation/concepts.md) - understand how panel data handling works internally
-- [How to Configure Forecasters](configure.md) - tune `season_length` and `n_jobs`
-- [API Reference](../reference/api.md) - forecaster parameter reference
+- [Concepts](../explanation/concepts.md): how panel data handling works internally
+- [How to Configure Forecasters](configure.md): tune `season_length` and `n_jobs`
+- [API Reference](../reference/api.md): forecaster parameter reference

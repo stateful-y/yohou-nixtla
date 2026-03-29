@@ -82,6 +82,6 @@ Yohou encodes panel structure in column names using the `__` separator (e.g., `s
 
 ## See Also
 
-- [Getting Started](../tutorials/getting-started.md) - install and first example
-- [Examples](../tutorials/examples.md) - interactive example notebooks
-- [API Reference](../reference/api.md) - detailed API documentation
+- [Getting Started](../tutorials/getting-started.md): install and run your first example
+- [Examples](../tutorials/examples.md): interactive example notebooks
+- [API Reference](../reference/api.md): detailed API documentation

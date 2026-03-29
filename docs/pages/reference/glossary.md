@@ -99,7 +99,7 @@ Reference terms and definitions for Yohou-Nixtla.
   seasonality, 24 for hourly data with daily seasonality.
 
 **`input_size`**
-: (Neural forecasters) Lookback window - how many historical time steps the
+: (Neural forecasters) Lookback window, the number of historical time steps the
   model uses as input for each prediction. Also called the context window.
   Should be at least twice the `forecasting_horizon`.
 

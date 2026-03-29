@@ -103,7 +103,7 @@ forecaster = NBEATSForecaster(
 )
 ```
 
-### Model underfits - predictions are flat or repeat the mean
+### Model underfits (predictions are flat or repeat the mean)
 
 Increase `max_steps` and lower the learning rate:
 
@@ -172,8 +172,8 @@ No. Install only the backend you need: `statsforecast` for Stats or
 
 ## Getting More Help
 
-- [Open an issue](https://github.com/stateful-y/yohou-nixtla/issues/new) - include
+- [Open an issue](https://github.com/stateful-y/yohou-nixtla/issues/new): include
   your Python version, package version (`yohou_nixtla.__version__`), and a minimal
   reproducible example
-- [Start a discussion](https://github.com/stateful-y/yohou-nixtla/discussions) - for
+- [Start a discussion](https://github.com/stateful-y/yohou-nixtla/discussions): for
   usage questions and design feedback

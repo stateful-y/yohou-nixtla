@@ -63,7 +63,7 @@ Set up and customize forecasters for your project.
 
 ### [API Reference](pages/reference/api.md)
 
-Complete API reference - classes, functions, and options.
+Complete API reference covering classes, functions, and options.
 
 ## License
 

@@ -120,6 +120,6 @@ forecaster = PatchTSTForecaster(input_size=48, max_steps=500)
 
 ## See Also
 
-- [Concepts](../explanation/concepts.md) - understand the trade-offs between backends
-- [How to Configure Forecasters](configure.md) - tune your chosen forecaster
-- [API Reference](../reference/api.md) - full parameter list for each class
+- [Concepts](../explanation/concepts.md): trade-offs between backends
+- [How to Configure Forecasters](configure.md): tune your chosen forecaster
+- [API Reference](../reference/api.md): full parameter list for each class

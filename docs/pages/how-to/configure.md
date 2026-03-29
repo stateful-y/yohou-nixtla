@@ -138,6 +138,6 @@ forecaster = AutoARIMAForecaster(
 
 ## See Also
 
-- [Concepts](../explanation/concepts.md) - understand the forecasting backends and configuration options
-- [API Reference](../reference/api.md) - full parameter list for each forecaster class
-- [Troubleshooting](troubleshooting.md) - fix common configuration errors
+- [Concepts](../explanation/concepts.md): forecasting backends and configuration options
+- [API Reference](../reference/api.md): full parameter list for each forecaster class
+- [Troubleshooting](troubleshooting.md): fix common configuration errors

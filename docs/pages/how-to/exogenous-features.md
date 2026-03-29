@@ -88,6 +88,6 @@ at prediction time.
 
 ## See Also
 
-- [Concepts](../explanation/concepts.md) - understand the exogenous feature design
-- [How to Configure Forecasters](configure.md) - configure `feature_transformer` and `target_as_feature`
-- [API Reference](../reference/api.md) - `fit` and `predict` method signatures
+- [Concepts](../explanation/concepts.md): exogenous feature design
+- [How to Configure Forecasters](configure.md): configure `feature_transformer` and `target_as_feature`
+- [API Reference](../reference/api.md): `fit` and `predict` method signatures
