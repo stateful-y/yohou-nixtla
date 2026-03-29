@@ -118,6 +118,11 @@ forecaster = PatchTSTForecaster(input_size=48, max_steps=500)
 | Long forecast horizon | `NHITSForecaster` |
 | Transformer-based model | `PatchTSTForecaster` |
 
+!!! tip "Interactive version available"
+
+    The [Comparing Forecasters](../tutorials/examples.md) notebook lets you run
+    side-by-side forecaster comparisons interactively.
+
 ## See Also
 
 - [Concepts](../explanation/concepts.md): trade-offs between backends

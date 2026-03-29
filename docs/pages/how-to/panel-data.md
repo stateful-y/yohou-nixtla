@@ -106,6 +106,11 @@ y = pl.DataFrame({
 
 Null rows at the beginning of a series are dropped before fitting.
 
+!!! tip "Interactive version available"
+
+    The [Forecasting Panel Data](../tutorials/examples.md) notebook lets you
+    experiment with panel data forecasting interactively.
+
 ## See Also
 
 - [Concepts](../explanation/concepts.md): how panel data handling works internally

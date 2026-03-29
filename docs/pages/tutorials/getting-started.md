@@ -76,44 +76,13 @@ forecaster.observe(y_new)
 y_pred = forecaster.predict(forecasting_horizon=12)
 ```
 
-## Complete Example
-
-Here's a complete working example comparing statistical and neural forecasters:
-
-```python
-from yohou.datasets import load_air_passengers
-from yohou_nixtla import AutoARIMAForecaster, NBEATSForecaster
-
-# Load data
-y = load_air_passengers()
-
-# Split into train/test
-y_train = y.head(len(y) - 12)
-
-# Statistical Forecaster
-arima = AutoARIMAForecaster(season_length=12)
-arima.fit(y_train, forecasting_horizon=12)
-y_pred_arima = arima.predict(forecasting_horizon=12)
-
-# Neural Forecaster
-nbeats = NBEATSForecaster(input_size=24, max_steps=100)
-nbeats.fit(y_train, forecasting_horizon=12)
-y_pred_nbeats = nbeats.predict(forecasting_horizon=12)
-
-print("AutoARIMA predictions:", y_pred_arima)
-print("NBEATS predictions:", y_pred_nbeats)
-```
-
 ## Try Interactive Examples
 
-For hands-on learning with interactive notebooks, see the [Examples](examples.md) page where you can:
+To compare statistical and neural forecasters side by side, try the
+[Comparing Forecasters](examples.md) interactive notebook.
 
-- Run code directly in your browser
-- Experiment with different parameters
-- See visual outputs in real-time
-- Download standalone HTML versions
-
-Or run locally:
+Browse all available notebooks on the [Examples](examples.md) page, or run one
+locally:
 
 === "just"
 
