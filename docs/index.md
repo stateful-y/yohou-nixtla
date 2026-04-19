@@ -43,28 +43,12 @@ Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast*
 
 </div>
 
-## Table of Contents
-
-### [Getting Started](pages/tutorials/getting-started.md)
-
-Install Yohou-Nixtla and produce your first forecast.
-
-### [Concepts](pages/explanation/concepts.md)
-
-Design, architecture, and core ideas behind Yohou-Nixtla.
-
-### [Examples](pages/tutorials/examples.md)
-
-Interactive notebooks demonstrating real-world usage.
-
-### [Configuration](pages/how-to/configure.md)
-
-Set up and customize forecasters for your project.
-
-### [API Reference](pages/reference/api.md)
-
-Complete API reference covering classes, functions, and options.
-
 ## License
 
-Yohou-Nixtla is open source and licensed under the [Apache-2.0 License](https://opensource.org/licenses/Apache-2.0).
+This project is licensed under the terms of the [Apache-2.0 License](https://github.com/stateful-y/yohou-nixtla/blob/main/LICENSE).
+
+## Acknowledgements
+
+This project is maintained by [stateful-y](https://stateful-y.io), an ML consultancy specializing in time series data science & engineering. If you're interested in collaborating or learning more about our services, please visit our website.
+
+![Made by stateful-y](assets/made_by_stateful-y.png){width=200}
