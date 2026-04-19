@@ -221,12 +221,7 @@ class PatchTSTForecaster(BaseNeuralForecaster):
 
     _estimator_default_class = PatchTST
 
-    def __sklearn_tags__(self):
-        """Get estimator tags (supports exogenous features)."""
-        tags = super().__sklearn_tags__()
-        assert tags.forecaster_tags is not None
-        tags.forecaster_tags.ignores_exogenous = False
-        return tags
+    _tags = {"ignores_exogenous": False}
 
 
 class TimesNetForecaster(BaseNeuralForecaster):
@@ -282,9 +277,4 @@ class TimesNetForecaster(BaseNeuralForecaster):
 
     _estimator_default_class = TimesNet
 
-    def __sklearn_tags__(self):
-        """Get estimator tags (supports exogenous features)."""
-        tags = super().__sklearn_tags__()
-        assert tags.forecaster_tags is not None
-        tags.forecaster_tags.ignores_exogenous = False
-        return tags
+    _tags = {"ignores_exogenous": False}

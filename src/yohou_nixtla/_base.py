@@ -85,7 +85,6 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
     """
 
     _parameter_constraints: dict = {
-        **BasePointForecaster._parameter_constraints,
         "freq": [str, None],
         "target_as_feature": [StrOptions({"transformed", "raw"}), None],
     }
@@ -159,22 +158,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         super().set_params(**params)
         return self
 
-    def __sklearn_tags__(self):
-        """Get estimator tags for this forecaster.
-
-        Returns
-        -------
-        Tags
-            Estimator tags with ``forecaster_type="point"`` and
-            ``uses_reduction=False``.
-
-        """
-        tags = super().__sklearn_tags__()
-        assert tags.forecaster_tags is not None
-        tags.forecaster_tags.forecaster_type = "point"
-        tags.forecaster_tags.uses_reduction = False
-        tags.forecaster_tags.ignores_exogenous = True
-        return tags
+    _tags = {"uses_reduction": False, "ignores_exogenous": True}
 
     def _validate_pre_fit(
         self,
@@ -456,7 +440,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
 
         return pl.concat([y_pred.select("time"), value_cols], how="horizontal")
 
-    def _predict_one(self, panel_group_names: list[str] | None = None, **params) -> pl.DataFrame:
+    def _predict(self, panel_group_names: list[str] | None = None, **params) -> pl.DataFrame:
         """Generate predictions for the fitted forecasting horizon.
 
         Parameters

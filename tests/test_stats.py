@@ -259,14 +259,14 @@ class TestFitPredict:
         forecaster.fit(y, forecasting_horizon=5)
         assert forecaster.freq_ == "D"
 
-    def test_predict_one_internal(self, fast_forecaster_cls, daily_y_X_factory):
-        """Internal _predict_one method should return valid predictions."""
+    def test_predict_internal(self, fast_forecaster_cls, daily_y_X_factory):
+        """Internal _predict method should return valid predictions."""
         y, _ = daily_y_X_factory(length=60)
         forecaster = _make_forecaster(fast_forecaster_cls)
         forecaster.fit(y, forecasting_horizon=5)
 
-        # Directly call the internal _predict_one method
-        y_pred = forecaster._predict_one()
+        # Directly call the internal _predict method
+        y_pred = forecaster._predict()
         assert isinstance(y_pred, pl.DataFrame)
         assert "time" in y_pred.columns
         assert len(y_pred) == 5
