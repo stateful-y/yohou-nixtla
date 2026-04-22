@@ -92,24 +92,44 @@ class TestBaseStatsForecaster:
 
     def test_sklearn_tags_without_forecaster_tags(self, fast_forecaster_cls):
         """__sklearn_tags__ skips _tags when forecaster_tags is None."""
-        from unittest.mock import MagicMock, patch
+        from unittest.mock import patch
 
         from yohou.point import BasePointForecaster
 
         forecaster = _make_forecaster(fast_forecaster_cls)
 
-        # Create mock tags with forecaster_tags=None
-        mock_tags = MagicMock()
-        mock_tags.forecaster_tags = None
+        # Make super().__sklearn_tags__() return tags with forecaster_tags=None
+        original_tags = BasePointForecaster.__sklearn_tags__
+
+        def tags_without_forecaster(self_inner):
+            t = original_tags(self_inner)
+            t.forecaster_tags = None
+            return t
 
         with patch.object(
             BasePointForecaster,
             "__sklearn_tags__",
-            return_value=mock_tags,
+            tags_without_forecaster,
         ):
             tags = forecaster.__sklearn_tags__()
-            # When forecaster_tags is None, _tags should not be applied
             assert tags.forecaster_tags is None
+
+    def test_sklearn_tags_unknown_tag_key_ignored(self, fast_forecaster_cls):
+        """Unknown keys in _tags are silently skipped."""
+        forecaster = _make_forecaster(fast_forecaster_cls)
+        # Temporarily add a bogus key to _tags on the class
+        cls = type(forecaster)
+        original = cls.__dict__.get("_tags")
+        cls._tags = {"not_a_real_tag": True}
+        try:
+            tags = forecaster.__sklearn_tags__()
+            assert tags.forecaster_tags is not None
+            assert not hasattr(tags.forecaster_tags, "not_a_real_tag")
+        finally:
+            if original is not None:
+                cls._tags = original
+            else:
+                del cls._tags
 
 
 class TestConstructor:
@@ -269,6 +289,22 @@ class TestFitPredict:
         assert isinstance(y_pred_step, pl.DataFrame)
         assert "time" in y_pred_step.columns
         assert len(y_pred_step) == 5
+
+    def test_predict_internal_with_target_transformer(self, fast_forecaster_cls, daily_y_X_factory):
+        """_predict with target_transformer should inverse-transform."""
+        from yohou.preprocessing import FunctionTransformer
+
+        y, _ = daily_y_X_factory(length=60)
+        ft = FunctionTransformer(
+            func=lambda X: X.with_columns([pl.col(c) * 2 for c in X.columns if c != "time"]),
+            inverse_func=lambda X: X.with_columns([pl.col(c) / 2 for c in X.columns if c != "time"]),
+        )
+        forecaster = _make_forecaster(fast_forecaster_cls, target_transformer=ft)
+        forecaster.fit(y, forecasting_horizon=5)
+
+        y_pred_step, y_pred_step_inv = forecaster._predict(groups=forecaster.groups_ or [])
+        assert isinstance(y_pred_step_inv, pl.DataFrame)
+        assert len(y_pred_step_inv) == 5
 
 
 class TestLifecycleMethods:
@@ -865,3 +901,23 @@ class TestSystematicChecks:
             _yield_yohou_forecaster_checks(forecaster, y_train, None, y_test, None),
             expected_failures=self.EXPECTED_FAILURES,
         )
+
+
+class TestModuleGetattr:
+    """Tests for yohou_nixtla.__getattr__ lazy import mechanism."""
+
+    def test_getattr_unknown_attribute_raises(self):
+        """Accessing a non-existent attribute raises AttributeError."""
+        import yohou_nixtla
+
+        with pytest.raises(AttributeError, match="has no attribute"):
+            yohou_nixtla.this_does_not_exist  # noqa: B018
+
+    def test_getattr_lazy_neural_import(self):
+        """Neural forecasters can be accessed from top-level module."""
+        import yohou_nixtla
+
+        cls = yohou_nixtla.NBEATSForecaster
+        from yohou_nixtla.neural import NBEATSForecaster
+
+        assert cls is NBEATSForecaster

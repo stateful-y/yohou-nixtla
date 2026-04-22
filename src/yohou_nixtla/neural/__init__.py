@@ -14,7 +14,7 @@ try:
         PatchTSTForecaster,
         TimesNetForecaster,
     )
-except ImportError as _err:
+except ImportError as _err:  # pragma: no cover
     raise ImportError(
         "Neural forecasters require the 'neural' extra. Install it with: pip install yohou-nixtla[neural]"
     ) from _err
