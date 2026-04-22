@@ -3,14 +3,6 @@
 from importlib.metadata import version
 
 from yohou_nixtla._base import BaseNixtlaForecaster
-from yohou_nixtla.neural import (
-    BaseNeuralForecaster,
-    MLPForecaster,
-    NBEATSForecaster,
-    NHITSForecaster,
-    PatchTSTForecaster,
-    TimesNetForecaster,
-)
 from yohou_nixtla.stats import (
     ARIMAForecaster,
     AutoARIMAForecaster,
@@ -51,3 +43,20 @@ __all__ = [
     "PatchTSTForecaster",
     "TimesNetForecaster",
 ]
+
+
+def __getattr__(name: str):
+    """Lazily import neural forecasters to avoid requiring neuralforecast."""
+    _neural_names = {
+        "BaseNeuralForecaster",
+        "MLPForecaster",
+        "NBEATSForecaster",
+        "NHITSForecaster",
+        "PatchTSTForecaster",
+        "TimesNetForecaster",
+    }
+    if name in _neural_names:
+        from yohou_nixtla import neural
+
+        return getattr(neural, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -20,7 +20,7 @@ import warnings
 
 import pandas as pd
 import polars as pl
-from yohou.utils.panel import inspect_locality
+from yohou.utils.panel import inspect_panel
 from yohou.utils.validation import check_interval_consistency
 
 __all__ = ["infer_freq", "yohou_to_nixtla", "nixtla_to_yohou"]
@@ -205,7 +205,7 @@ def _add_exogenous(
     if not x_cols:
         return long_df
 
-    _, x_panel_groups = inspect_locality(X)
+    _, x_panel_groups = inspect_panel(X)
 
     if x_panel_groups:
         # Panel exogenous: match by entity prefix, with suffix fallback
