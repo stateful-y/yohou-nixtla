@@ -73,6 +73,7 @@ Yohou encodes panel structure in column names using the `__` separator (e.g., `s
 ## Limitations and Considerations
 
 1. **Point forecasts only**: Yohou-Nixtla currently wraps forecasters as `BasePointForecaster`. Interval/probabilistic forecasts from Nixtla are not yet exposed.
+However, one can obtain prediction intervals in Yohou by wrapping a Point Forecaster with `SplitConformalForecaster`.
 
 2. **Polars ↔ pandas overhead**: Each `fit`/`predict` call converts data between polars and pandas. For very high-frequency prediction loops, this may add latency.
 
