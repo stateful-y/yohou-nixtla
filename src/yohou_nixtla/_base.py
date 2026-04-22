@@ -24,9 +24,9 @@ from sklearn.utils.validation import check_is_fitted
 from sklearn_wrap.base import BaseClassWrapper
 from yohou.point import BasePointForecaster
 from yohou.utils import cast
-from yohou.utils.panel import dict_to_panel, inspect_locality, select_panel_columns
+from yohou.utils.panel import dict_to_panel, inspect_panel, select_panel_columns
 from yohou.utils.validate_data import validate_forecaster_data
-from yohou.utils.validation import check_panel_group_names
+from yohou.utils.validation import check_groups
 
 from yohou_nixtla._conversion import infer_freq, nixtla_to_yohou, yohou_to_nixtla
 
@@ -85,7 +85,6 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
     """
 
     _parameter_constraints: dict = {
-        **BasePointForecaster._parameter_constraints,
         "freq": [str, None],
         "target_as_feature": [StrOptions({"transformed", "raw"}), None],
     }
@@ -159,21 +158,20 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         super().set_params(**params)
         return self
 
+    _tags = {"uses_reduction": False, "ignores_exogenous": True}
+
     def __sklearn_tags__(self):
-        """Get estimator tags for this forecaster.
-
-        Returns
-        -------
-        Tags
-            Estimator tags with ``forecaster_type="point"`` and
-            ``uses_reduction=False``.
-
-        """
+        """Get estimator tags, applying ``_tags`` overrides from the class hierarchy."""
         tags = super().__sklearn_tags__()
-        assert tags.forecaster_tags is not None
-        tags.forecaster_tags.forecaster_type = "point"
-        tags.forecaster_tags.uses_reduction = False
-        tags.forecaster_tags.ignores_exogenous = True
+        if tags.forecaster_tags is not None:
+            # Collect _tags from all classes in the MRO (base first, most specific last)
+            merged: dict = {}
+            for cls in reversed(type(self).__mro__):
+                if "_tags" in cls.__dict__:
+                    merged.update(cls.__dict__["_tags"])
+            for key, value in merged.items():
+                if hasattr(tags.forecaster_tags, key):
+                    setattr(tags.forecaster_tags, key, value)
         return tags
 
     def _validate_pre_fit(
@@ -219,10 +217,10 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         y, X, _ = validate_forecaster_data(self, y, X, reset=True)
         self.fit_forecasting_horizon_ = forecasting_horizon
 
-        _, y_panel_groups = inspect_locality(y)
+        _, y_panel_groups = inspect_panel(y)
         X_panel_groups = None
         if X is not None:
-            _, X_panel_groups = inspect_locality(X)
+            _, X_panel_groups = inspect_panel(X)
             if len(X_panel_groups) and list(X_panel_groups.keys()) != list(y_panel_groups.keys()):
                 raise ValueError("`X` and `y` do not have the same local group names.")
 
@@ -310,7 +308,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         self,
         X: pl.DataFrame | None = None,
         forecasting_horizon: int | None = None,
-        panel_group_names: list[str] | None = None,
+        groups: list[str] | None = None,
         predict_transformed: bool = False,
         **params,
     ) -> pl.DataFrame:
@@ -330,7 +328,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
             Future exogenous features.
         forecasting_horizon : int or None, default=None
             Number of steps to forecast. If None, uses the horizon from fit.
-        panel_group_names : list of str or None, default=None
+        groups : list of str or None, default=None
             Panel groups to predict.
         predict_transformed : bool, default=False
             Whether to return transformed predictions.
@@ -345,8 +343,8 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         """
         check_is_fitted(self, ["nixtla_forecaster_", "y_columns_"])
 
-        # Validate and normalize panel_group_names
-        panel_group_names = check_panel_group_names(self.panel_group_names_, panel_group_names)
+        # Validate and normalize groups
+        groups = check_groups(self.groups_, groups)
 
         h = forecasting_horizon if forecasting_horizon is not None else self.fit_forecasting_horizon_
 
@@ -375,7 +373,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         result = self._add_time_columns(y_pred_no_time)
 
         # Filter to requested panel groups (keeps time columns as globals)
-        return select_panel_columns(result, panel_group_names, include_global=True)
+        return select_panel_columns(result, groups, include_global=True)
 
     @abc.abstractmethod
     def _predict_backend(self, forecasting_horizon: int, X: pl.DataFrame | None = None) -> Any:
@@ -410,7 +408,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
             cast to original dtypes.
 
         """
-        if self.panel_group_names_ is None:
+        if self.groups_ is None:
             # Standard data
             transformer = typing_cast(Any, self.target_transformer_)
             y_pred_inv = transformer.inverse_transform(X_t=y_pred, X_p=self._y_observed)
@@ -419,13 +417,15 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
             return pl.concat([y_pred_inv.select("time"), value_cols], how="horizontal")
 
         # Panel data: per-group inverse transform
+        assert isinstance(self.target_transformer_, dict)
+        assert isinstance(self._y_observed, dict)
         inv_parts: list[pl.DataFrame] = []
-        for group_name in self.panel_group_names_:
+        for group_name in self.groups_:
             group_cols = [c for c in y_pred.columns if c.startswith(f"{group_name}__")]
             group_df = y_pred.select(["time"] + group_cols)
             transformer = self.target_transformer_[group_name]
             y_obs = self._y_observed[group_name]
-            group_inv = transformer.inverse_transform(X_t=group_df, X_p=y_obs)
+            group_inv = typing_cast(Any, transformer).inverse_transform(X_t=group_df, X_p=y_obs)
 
             schema = {f"{group_name}__{col}": dtype for col, dtype in self.local_y_schema_.items()}
             inv_parts.append(cast(group_inv.select(~cs.by_name("time")), schema))
@@ -446,49 +446,50 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
             Predictions with value columns cast to original dtypes.
 
         """
-        if self.panel_group_names_ is None:
+        if self.groups_ is None:
             value_cols = cast(y_pred.select(~cs.by_name("time")), self.local_y_schema_)
         else:
             schema: dict = {}
-            for group_name in self.panel_group_names_:
+            for group_name in self.groups_:
                 schema.update({f"{group_name}__{col}": dtype for col, dtype in self.local_y_schema_.items()})
             value_cols = cast(y_pred.select(~cs.by_name("time")), schema)
 
         return pl.concat([y_pred.select("time"), value_cols], how="horizontal")
 
-    def _predict_one(self, panel_group_names: list[str] | None = None, **params) -> pl.DataFrame:
+    def _predict(self, groups: list[str], **params) -> tuple[pl.DataFrame, pl.DataFrame]:
         """Generate predictions for the fitted forecasting horizon.
 
         Parameters
         ----------
-        panel_group_names : list of str or None, default=None
-            Panel groups to predict.  When not ``None``, the output is
-            filtered to the requested groups only.
+        groups : list of str
+            Panel groups to predict.
         **params : dict
             Additional metadata routing parameters.
 
         Returns
         -------
-        pl.DataFrame
-            Predictions with ``observed_time`` and ``time`` columns.
+        y_pred_step : pl.DataFrame
+            Predicted time series in transformed space.
+        y_pred_step_inv : pl.DataFrame
+            Inverse transformed predicted time series (original scale).
 
         """
         check_is_fitted(self, ["nixtla_forecaster_", "y_columns_"])
-
-        # Validate and normalize panel_group_names
-        panel_group_names = check_panel_group_names(self.panel_group_names_, panel_group_names)
 
         forecast_df = self._predict_backend(self.fit_forecasting_horizon_)
 
         y_pred = nixtla_to_yohou(
             forecast_df.reset_index() if hasattr(forecast_df, "index") else forecast_df,
             y_columns=self.y_columns_,
-        ).drop("time")
+        )
 
-        result = self._add_time_columns(y_pred)
+        # Apply inverse target transform
+        if self.target_transformer is not None:
+            y_pred_inv = self._inverse_transform_predictions(y_pred)
+        else:
+            y_pred_inv = self._cast_predictions(y_pred)
 
-        # Filter to requested panel groups (keeps time columns as globals)
-        return select_panel_columns(result, panel_group_names, include_global=True)
+        return y_pred, y_pred_inv
 
     def _convert_nixtla_to_yohou(
         self,

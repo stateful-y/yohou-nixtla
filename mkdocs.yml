@@ -140,11 +140,20 @@ plugins:
 
 nav:
   - Home: index.md
-  - Getting Started: pages/getting-started.md
-  - User Guide: pages/user-guide.md
-  - Examples: pages/examples.md
-  - API Reference: pages/api-reference.md
-  - Contributing: pages/contributing.md
+  - Tutorials:
+    - Getting Started: pages/tutorials/getting-started.md
+    - Examples: pages/tutorials/examples.md
+  - How-to Guides:
+    - Choose the Right Forecaster: pages/how-to/choose-forecaster.md
+    - Work with Panel Data: pages/how-to/panel-data.md
+    - Use Exogenous Features: pages/how-to/exogenous-features.md
+    - Integrate with Yohou: pages/how-to/integrate-yohou.md
+    - Troubleshooting: pages/how-to/troubleshooting.md
+    - Contributing: pages/how-to/contribute.md
+  - Reference:
+    - API Reference: pages/reference/api.md
+  - Explanation:
+    - Concepts: pages/explanation/concepts.md
 
 extra:
   social:
