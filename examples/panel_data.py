@@ -21,9 +21,9 @@ def _():
     import marimo as mo
 
     __gallery__ = {
-        "title": "Panel Data Forecasting",
-        "description": "Forecast multiple related time series simultaneously using the panel column naming convention.",
-        "category": "Getting Started",
+        "title": "How to Forecast Panel Data",
+        "description": "Forecast multiple related time series using the panel column naming convention.",
+        "category": "how-to",
     }
 
     return (mo,)
@@ -47,20 +47,15 @@ def _():
 def _(mo):
     mo.md(
         r"""
-        # Panel Data Forecasting
+        # How to Forecast Panel Data
 
-        Yohou-Nixtla handles panel (grouped) time series automatically.
-        Columns with the `__` separator are treated as panel groups.
+        This notebook shows how to forecast multiple related time series using
+        the `__` panel column naming convention. See
+        [About Yohou-Nixtla](/pages/explanation/concepts/#panel-data)
+        for background on how panel detection works.
 
-        ## What You'll Learn
-
-        - How to structure panel data using the `__` column naming convention
-        - Fitting a single forecaster across multiple groups simultaneously
-        - Generating group-level predictions with the same `fit`/`predict` API
-
-        ## Prerequisites
-
-        Basic familiarity with Yohou-Nixtla's fit/predict API. See [`model_comparison.py`](/examples/model_comparison/) for an introduction.
+        **Prerequisites:** Yohou-Nixtla installed and familiarity with the
+        fit/predict API ([Getting Started](/pages/tutorials/getting-started/)).
         """
     )
 
@@ -69,9 +64,11 @@ def _(mo):
 def _(mo):
     mo.md(
         r"""
-        ## 1. Generate Panel Data
+        ## 1. Create Panel Data
 
-        Create a synthetic dataset with two store-level time series using the `__` column naming convention (e.g. `sales__store_A`).
+        Structure a DataFrame with `time` and panel columns using the `__`
+        separator (e.g. `sales__store_A`). If groups have unequal lengths,
+        pad the shorter series with `null` values at the start.
         """
     )
 
@@ -106,7 +103,7 @@ def _(mo):
         r"""
         ## 2. Fit and Predict
 
-        Fit a single [`NaiveForecaster`](/pages/api/generated/yohou_nixtla.stats.NaiveForecaster/) to all panel groups at once. The forecaster automatically handles per-group fitting and prediction.
+        Fit a single forecaster to all panel groups at once.
         """
     )
 
@@ -126,7 +123,7 @@ def _(mo):
         r"""
         ## 3. Visualize Results
 
-        Plot actual and forecasted values side by side for each store to compare predictions per group.
+        Plot actual and forecasted values per group.
         """
     )
 
@@ -156,30 +153,6 @@ def _(go, make_subplots, y, y_pred):
 
     fig.update_layout(title="Panel Forecasting: Two Stores", showlegend=True)
     fig
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(
-        r"""
-        ## Key Takeaways
-
-        - **`__` column naming convention** automatically declares panel groups
-        - **Single forecaster** handles all groups at once -- no manual looping
-        - Predictions preserve the same panel structure as the input data
-        """
-    )
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(
-        r"""
-        ## Next Steps
-
-        - **Model comparison**: See [`model_comparison.py`](/examples/model_comparison/) to compare statistical and neural forecasters side by side
-        """
-    )
 
 
 if __name__ == "__main__":
