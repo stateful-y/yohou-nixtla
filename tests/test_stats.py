@@ -87,11 +87,11 @@ class TestBaseStatsForecaster:
         forecaster = _make_forecaster(fast_forecaster_cls)
         tags = forecaster.__sklearn_tags__()
         assert tags.forecaster_tags is not None
-        assert tags.forecaster_tags.forecaster_type == "point"
+        assert "point" in tags.forecaster_tags.forecaster_type
         assert tags.forecaster_tags.uses_reduction is False
 
     def test_sklearn_tags_without_forecaster_tags(self, fast_forecaster_cls):
-        """__sklearn_tags__ raises when forecaster_tags is None."""
+        """__sklearn_tags__ skips _tags when forecaster_tags is None."""
         from unittest.mock import MagicMock, patch
 
         from yohou.point import BasePointForecaster
@@ -102,15 +102,14 @@ class TestBaseStatsForecaster:
         mock_tags = MagicMock()
         mock_tags.forecaster_tags = None
 
-        with (
-            patch.object(
-                BasePointForecaster,
-                "__sklearn_tags__",
-                return_value=mock_tags,
-            ),
-            pytest.raises(AssertionError),
+        with patch.object(
+            BasePointForecaster,
+            "__sklearn_tags__",
+            return_value=mock_tags,
         ):
-            forecaster.__sklearn_tags__()
+            tags = forecaster.__sklearn_tags__()
+            # When forecaster_tags is None, _tags should not be applied
+            assert tags.forecaster_tags is None
 
 
 class TestConstructor:
@@ -200,7 +199,7 @@ class TestFitPredict:
         y_pred = forecaster.predict()
         assert isinstance(y_pred, pl.DataFrame)
         assert "time" in y_pred.columns
-        assert "observed_time" in y_pred.columns
+        assert "vintage_time" in y_pred.columns
         assert len(y_pred) == 5
 
     def test_predict_custom_horizon(self, fast_forecaster_cls, daily_y_X_factory):
@@ -219,7 +218,7 @@ class TestFitPredict:
         forecaster.fit(y, forecasting_horizon=5)
 
         y_pred = forecaster.predict()
-        expected_cols = {"time", "observed_time", "y_0", "y_1"}
+        expected_cols = {"time", "vintage_time", "y_0", "y_1"}
         assert set(y_pred.columns) == expected_cols
 
     def test_predict_time_continuity(self, fast_forecaster_cls, daily_y_X_factory):
@@ -266,10 +265,10 @@ class TestFitPredict:
         forecaster.fit(y, forecasting_horizon=5)
 
         # Directly call the internal _predict method
-        y_pred = forecaster._predict()
-        assert isinstance(y_pred, pl.DataFrame)
-        assert "time" in y_pred.columns
-        assert len(y_pred) == 5
+        y_pred_step, y_pred_step_inv = forecaster._predict(groups=forecaster.groups_ or [])
+        assert isinstance(y_pred_step, pl.DataFrame)
+        assert "time" in y_pred_step.columns
+        assert len(y_pred_step) == 5
 
 
 class TestLifecycleMethods:
@@ -348,7 +347,7 @@ class TestMultivariate:
 
         y_pred = forecaster.predict()
         assert len(y_pred) == 5
-        # 3 targets + time + observed_time
+        # 3 targets + time + vintage_time
         assert len(y_pred.columns) == 5
 
 
@@ -374,7 +373,7 @@ class TestPanelData:
 
         y_pred = forecaster.predict()
         y_cols = [c for c in y.columns if c != "time"]
-        pred_cols = [c for c in y_pred.columns if c not in ("time", "observed_time")]
+        pred_cols = [c for c in y_pred.columns if c not in ("time", "vintage_time")]
         assert set(pred_cols) == set(y_cols)
 
     def test_panel_group_mismatch_raises(self):
@@ -578,7 +577,7 @@ class TestTransformerIntegration:
 
         assert len(y_pred) == 3
         assert "time" in y_pred.columns
-        assert "observed_time" in y_pred.columns
+        assert "vintage_time" in y_pred.columns
 
     def test_predict_transformed_flag(self, fast_forecaster_cls, daily_y_X_factory):
         """predict_transformed=True should skip inverse transform."""
@@ -631,7 +630,7 @@ class TestTransformerIntegration:
 
         assert len(y_pred) == 3
         y_cols = [c for c in y.columns if c != "time"]
-        pred_cols = [c for c in y_pred.columns if c not in ("time", "observed_time")]
+        pred_cols = [c for c in y_pred.columns if c not in ("time", "vintage_time")]
         assert set(pred_cols) == set(y_cols)
 
     def test_target_transformer_inverse_values_correct(self, fast_forecaster_cls, daily_y_X_factory):
@@ -651,7 +650,7 @@ class TestTransformerIntegration:
         y_inv = forecaster.predict(predict_transformed=False)
         y_raw = forecaster.predict(predict_transformed=True)
 
-        value_cols = [c for c in y_inv.columns if c not in ("time", "observed_time")]
+        value_cols = [c for c in y_inv.columns if c not in ("time", "vintage_time")]
         for col in value_cols:
             inv_vals = y_inv[col].to_list()
             raw_vals = y_raw[col].to_list()
@@ -677,7 +676,7 @@ class TestTransformerIntegration:
         y_inv = forecaster.predict(predict_transformed=False)
         y_raw = forecaster.predict(predict_transformed=True)
 
-        value_cols = [c for c in y_inv.columns if c not in ("time", "observed_time")]
+        value_cols = [c for c in y_inv.columns if c not in ("time", "vintage_time")]
         for col in value_cols:
             inv_vals = y_inv[col].to_list()
             raw_vals = y_raw[col].to_list()
