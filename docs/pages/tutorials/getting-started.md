@@ -1,12 +1,9 @@
 # Getting Started
 
-In this tutorial, we will install Yohou-Nixtla and produce a first forecast.
+In this tutorial, we will install Yohou-Nixtla, fit a forecaster to the classic
+Air Passengers dataset, and generate a 12-month forecast.
 
-## Installation
-
-### Step 1: Install the package
-
-Choose your preferred package manager:
+## Install Yohou-Nixtla
 
 === "pip"
 
@@ -20,87 +17,104 @@ Choose your preferred package manager:
     uv add yohou-nixtla
     ```
 
-=== "conda"
-
-    ```bash
-    conda install -c conda-forge yohou-nixtla
-    ```
-
-=== "mamba"
-
-    ```bash
-    mamba install -c conda-forge yohou-nixtla
-    ```
-
-> **Note**: For conda/mamba, ensure the package is published to conda-forge first.
-
-### Step 2: Verify installation
+Verify the installation:
 
 ```python
 import yohou_nixtla
 print(yohou_nixtla.__version__)
 ```
 
-## Basic Usage
+The output should look something like:
 
-### Step 1: Fit a statistical forecaster
+```text
+0.1.0
+```
+
+## Load the data
+
+We will use the Air Passengers dataset, a monthly time series of international
+airline passengers from 1949 to 1960. Yohou ships it as a built-in dataset:
 
 ```python
 from yohou.datasets import load_air_passengers
+
+y = load_air_passengers()
+print(y.head(3))
+```
+
+```text
+shape: (3, 2)
+┌─────────────────────┬────────────┐
+│ time                ┆ Passengers │
+│ ---                 ┆ ---        │
+│ datetime[μs]        ┆ i64        │
+╞═════════════════════╪════════════╡
+│ 1949-01-01 00:00:00 ┆ 112        │
+│ 1949-02-01 00:00:00 ┆ 118        │
+│ 1949-03-01 00:00:00 ┆ 132        │
+└─────────────────────┴────────────┘
+```
+
+Notice the two columns: `time` holds timestamps, and `Passengers` holds the
+values. This is Yohou's standard wide-format layout.
+
+Now split the data, keeping the last 12 months as a holdout:
+
+```python
+y_train = y.head(len(y) - 12)
+y_test = y.tail(12)
+```
+
+## Fit a forecaster
+
+Create an `AutoARIMAForecaster` and fit it on the training data.
+`season_length=12` tells the model to look for annual seasonality in monthly
+data:
+
+```python
 from yohou_nixtla import AutoARIMAForecaster
 
-# Load data: polars DataFrame with "time" and "passengers" columns
-y = load_air_passengers()
-
-# Create and fit an AutoARIMA forecaster
 forecaster = AutoARIMAForecaster(season_length=12)
-forecaster.fit(y, forecasting_horizon=12)
+forecaster.fit(y_train, forecasting_horizon=12)
 ```
 
-### Step 2: Generate predictions
+## Generate predictions
+
+Predict the next 12 months:
 
 ```python
-# Predict the next 12 months
 y_pred = forecaster.predict(forecasting_horizon=12)
-print(y_pred)
+print(y_pred.head(3))
 ```
 
-### Step 3: Update with new observations
-
-```python
-# When new data arrives, update without refitting
-y_new = y.tail(3)
-forecaster.observe(y_new)
-
-# Predict again from the updated state
-y_pred = forecaster.predict(forecasting_horizon=12)
+```text
+shape: (3, 3)
+┌─────────────────────┬─────────────────────┬────────────┐
+│ observed_time       ┆ time                ┆ Passengers │
+│ ---                 ┆ ---                 ┆ ---        │
+│ datetime[μs]        ┆ datetime[μs]        ┆ i64        │
+╞═════════════════════╪═════════════════════╪════════════╡
+│ 1959-12-01 00:00:00 ┆ 1960-01-01 00:00:00 ┆ 424        │
+│ 1959-12-01 00:00:00 ┆ 1960-02-01 00:00:00 ┆ 407        │
+│ 1959-12-01 00:00:00 ┆ 1960-03-01 00:00:00 ┆ 471        │
+└─────────────────────┴─────────────────────┘────────────┘
 ```
 
-## Try Interactive Examples
+Notice the output has three columns: `observed_time` (the last training
+timestamp), `time` (the forecast timestamps), and `Passengers` (the predicted
+values).
 
-To compare statistical and neural forecasters side by side, try the
-[Comparing Forecasters](examples.md) interactive notebook.
+## What we built
 
-Browse all available notebooks on the [Examples](examples.md) page, or run one
-locally:
+You have installed Yohou-Nixtla, loaded a dataset, fit an AutoARIMA
+forecaster, and generated a 12-month forecast. The same `fit`/`predict`
+pattern works for all 15 forecasters in the package.
 
-=== "just"
+## Next steps
 
-    ```bash
-    just example model_comparison.py
-    ```
-
-=== "uv run"
-
-    ```bash
-    uv run marimo edit examples/model_comparison.py
-    ```
-
-## Next Steps
-
-Now that you have Yohou-Nixtla installed and running:
-
-- **Learn the concepts**: Read the [Concepts](../explanation/concepts.md) to understand the forecasting backends, data conversion, and panel data support
-- **Explore examples**: Check out the [Examples](examples.md) for interactive demonstrations
-- **Dive into the API**: Browse the [API Reference](../reference/api.md) for detailed documentation on all forecaster classes
-- **Get help**: Visit [GitHub Discussions](https://github.com/stateful-y/yohou-nixtla/discussions) or [open an issue](https://github.com/stateful-y/yohou-nixtla/issues)
+- [Examples](examples.md): compare statistical and neural forecasters
+  interactively
+- [How to Choose a Forecaster](../how-to/choose-forecaster.md): pick the
+  right model for your data
+- [Concepts](../explanation/concepts.md): understand the forecasting backends
+  and data conversion

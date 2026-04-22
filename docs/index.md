@@ -3,7 +3,7 @@
 
 # Welcome to Yohou-Nixtla's documentation
 
-Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast** and **NeuralForecast**) into the Yohou ecosystem. Each backend is wrapped as a scikit-learn-compatible forecaster with full support for `fit`, `predict`, `update`, and `reset`, so you can use classical statistical models and deep learning architectures through a single unified API.
+Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast** and **NeuralForecast**) into the [Yohou](https://yohou.readthedocs.io/) ecosystem. Each backend is wrapped as a scikit-learn-compatible Yohou forecaster with full support for `fit`, `predict`, `observe`, and `rewind`, so you can use classical statistical models and deep learning architectures through a single unified API.
 
 !!! note "Powered by Nixtla"
     Under the hood, Yohou-Nixtla delegates to [Nixtla](https://nixtla.io/) libraries. Data is automatically converted between Yohou's polars wide-format and Nixtla's pandas long-format, so you never need to wrangle DataFrames yourself.
@@ -42,6 +42,26 @@ Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast*
     [Examples](pages/tutorials/examples.md)
 
 </div>
+
+## Key Features
+
+- **15 forecasters, one API**: 10 statistical models (AutoARIMA, AutoETS, Holt-Winters, ...) and 5 neural
+architectures (NBEATS, NHITS, PatchTST, ...) all sharing `fit` / `predict` / `observe` / `rewind`.
+
+- **Yohou and Scikit-Learn-compatible**: Every forecaster supports `clone`, `get_params`, and `set_params`.
+Use Yohou's `GridSearchCV` for time series hyperparameter search.
+
+- **Panel data out of the box**: Name columns with the `__` separator (`sales__store_1`) and
+Yohou-Nixtla fits each group independently in a single call.
+
+- **Automatic data conversion**: Polars wide-format DataFrames are converted to Nixtla's pandas
+long-format transparently on every `fit` and `predict` call.
+
+- **Exogenous features**: Pass external regressors through `X` with optional
+`feature_transformer` for automatic scaling and preprocessing.
+
+- **Minimal boilerplate**: Adding a new Nixtla model is a three-line class. No glue code,
+no manual DataFrame wrangling.
 
 ## License
 

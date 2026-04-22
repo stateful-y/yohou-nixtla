@@ -7,47 +7,10 @@ data and use case.
 
 - Yohou-Nixtla installed ([Getting Started](../tutorials/getting-started.md))
 
-## Step 1: Decide between Stats and Neural
+## Establish a baseline first
 
-Start with a Stats forecaster unless you have a specific reason not to:
-
-- Stats forecasters train in seconds and require minimal configuration
-- Neural forecasters can take minutes to hours and require GPU for large runs
-
-Switch to Neural when:
-
-- Your dataset has more than 5,000 observations per series
-- Classical models (AutoARIMA, AutoETS) consistently underfit after tuning
-- You need a transformer-based or deep learning model specifically
-
-## Step 2: Choose within Stats Forecasters
-
-### Use `AutoARIMAForecaster` as the default
-
-AutoARIMA selects the best ARIMA order automatically. It is robust and handles
-a wide range of data patterns.
-
-```python
-from yohou_nixtla import AutoARIMAForecaster
-
-forecaster = AutoARIMAForecaster(season_length=12)
-```
-
-### Use `AutoETSForecaster` for clear trend or multiplicative seasonality
-
-ETS models decompose data into Error, Trend, and Seasonality components.
-AutoETS selects the best combination.
-
-```python
-from yohou_nixtla import AutoETSForecaster
-
-forecaster = AutoETSForecaster(season_length=12)
-```
-
-### Use `NaiveForecaster` or `SeasonalNaiveForecaster` as baselines
-
-Before investing in complex models, establish a baseline that any production
-model must beat:
+Before comparing models, fit a `SeasonalNaiveForecaster` so you have a
+reference any production model must beat:
 
 ```python
 from yohou_nixtla import SeasonalNaiveForecaster
@@ -57,13 +20,39 @@ baseline.fit(y, forecasting_horizon=12)
 y_baseline = baseline.predict(forecasting_horizon=12)
 ```
 
-If a more complex model cannot beat the seasonal naive baseline, revisit your
-data quality or feature engineering before trying harder models.
+If a more complex model cannot beat this baseline, revisit your data quality
+or feature engineering before trying harder models.
 
-### Use `CrostonForecaster` for intermittent demand
+## Pick a Stats forecaster
 
-If your series contains many zeros (sparse demand data), standard models
-overfit the non-zero spikes. Use Croston instead:
+Start with Stats as they train in seconds and need minimal configuration.
+
+### `AutoARIMAForecaster` (default choice)
+
+Automatically selects the best ARIMA order. Robust across a wide range of
+data patterns. Also accepts exogenous features via `X`.
+
+```python
+from yohou_nixtla import AutoARIMAForecaster
+
+forecaster = AutoARIMAForecaster(season_length=12)
+```
+
+### `AutoETSForecaster` for trend or multiplicative seasonality
+
+Best when the data has a clear trend or the seasonal amplitude grows with
+the level.
+
+```python
+from yohou_nixtla import AutoETSForecaster
+
+forecaster = AutoETSForecaster(season_length=12)
+```
+
+### `CrostonForecaster` for intermittent demand
+
+If your series contains many zeros (sparse demand), standard models overfit
+the non-zero spikes. Use Croston instead:
 
 ```python
 from yohou_nixtla import CrostonForecaster
@@ -71,12 +60,29 @@ from yohou_nixtla import CrostonForecaster
 forecaster = CrostonForecaster()
 ```
 
-## Step 3: Choose within Neural Forecasters
+### Other Stats forecasters
 
-### Use `NBEATSForecaster` as the default neural model
+| Forecaster | When to reach for it |
+|------------|---------------------|
+| `AutoCESForecaster` | Complex exponential smoothing with automatic selection |
+| `AutoThetaForecaster` | Strong baseline for monthly M3/M4 competition data |
+| `ARIMAForecaster` | You know the exact `(p, d, q)` order; supports exogenous features |
+| `HoltWintersForecaster` | You want explicit control over error, trend, and seasonality types |
+| `ThetaForecaster` | Simple, fast decomposition; good for short seasonal series |
 
-N-BEATS is a strong general-purpose neural forecaster with no preprocessing
-requirements and good interpretability:
+## Switch to Neural when Stats fall short
+
+Consider Neural forecasters when:
+
+- Your dataset has more than 5,000 observations per series
+- Stats models consistently underfit after tuning
+- You need a transformer-based or deep learning architecture
+
+Neural forecasters take longer to train and benefit from GPU acceleration.
+
+### `NBEATSForecaster` (default neural choice)
+
+General-purpose, no preprocessing requirements:
 
 ```python
 from yohou_nixtla import NBEATSForecaster
@@ -84,10 +90,10 @@ from yohou_nixtla import NBEATSForecaster
 forecaster = NBEATSForecaster(input_size=24, max_steps=500)
 ```
 
-### Use `NHITSForecaster` for long horizons
+### `NHITSForecaster` for long horizons
 
-N-HiTS uses hierarchical interpolation and outperforms N-BEATS when the
-forecast horizon is long relative to the input window:
+Outperforms N-BEATS when the forecast horizon is long relative to the input
+window:
 
 ```python
 from yohou_nixtla import NHITSForecaster
@@ -95,10 +101,9 @@ from yohou_nixtla import NHITSForecaster
 forecaster = NHITSForecaster(input_size=48, max_steps=500)
 ```
 
-### Use `PatchTSTForecaster` for a transformer-based approach
+### `PatchTSTForecaster` for exogenous features with a transformer
 
-PatchTST uses patch-based self-attention. It works well on long sequences and
-treats each series independently:
+Patch-based self-attention. Also accepts exogenous features via `X`:
 
 ```python
 from yohou_nixtla import PatchTSTForecaster
@@ -106,17 +111,39 @@ from yohou_nixtla import PatchTSTForecaster
 forecaster = PatchTSTForecaster(input_size=48, max_steps=500)
 ```
 
-## Quick Reference
+### Other Neural forecasters
+
+| Forecaster | When to reach for it |
+|------------|---------------------|
+| `MLPForecaster` | Lightweight neural baseline; fast to train |
+| `TimesNetForecaster` | Multi-periodicity data; also supports exogenous features |
+
+## If you need exogenous features
+
+Only four forecasters accept external regressors through the `X` parameter:
+
+| Backend | Forecaster |
+|---------|-----------|
+| Stats | `AutoARIMAForecaster`, `ARIMAForecaster` |
+| Neural | `PatchTSTForecaster`, `TimesNetForecaster` |
+
+If you have exogenous features and want a Stats model, use `AutoARIMAForecaster`.
+For a Neural model, use `PatchTSTForecaster`.
+
+See [How to Use Exogenous Features](exogenous-features.md) for details.
+
+## Quick reference
 
 | Scenario | Recommended Forecaster |
 |----------|----------------------|
-| Quick baseline, then improve | `SeasonalNaiveForecaster` |
+| Quick baseline | `SeasonalNaiveForecaster` |
 | Monthly data, annual seasonality | `AutoARIMAForecaster(season_length=12)` |
 | Clear trend or multiplicative seasonality | `AutoETSForecaster` |
 | Sparse or intermittent demand | `CrostonForecaster` |
 | Large dataset or complex patterns | `NBEATSForecaster` |
 | Long forecast horizon | `NHITSForecaster` |
-| Transformer-based model | `PatchTSTForecaster` |
+| Exogenous features (Stats) | `AutoARIMAForecaster` |
+| Exogenous features (Neural) | `PatchTSTForecaster` |
 
 !!! tip "Interactive version available"
 
@@ -126,5 +153,5 @@ forecaster = PatchTSTForecaster(input_size=48, max_steps=500)
 ## See Also
 
 - [Concepts](../explanation/concepts.md): trade-offs between backends
-- [How to Configure Forecasters](configure.md): tune your chosen forecaster
+- [How to Use Exogenous Features](exogenous-features.md): pass external regressors
 - [API Reference](../reference/api.md): full parameter list for each class

@@ -7,80 +7,96 @@ into your forecasts.
 
 - Yohou-Nixtla installed ([Getting Started](../tutorials/getting-started.md))
 - Feature data aligned with your target time series
-- A **neural forecaster** - only neural forecasters use exogenous features at
-  prediction time. Stats forecasters accept `X` in `fit` but ignore it during
-  prediction.
 
-## Steps
+## Supported forecasters
 
-### 1. Prepare your feature DataFrames
+Only these forecasters accept exogenous features:
 
-Create a polars DataFrame with a `time` column and one column per feature. The
-`time` values must cover both the training period and the forecast horizon since
-neural forecasters require future feature values at prediction time:
+| Backend | Forecaster |
+|---------|-----------|
+| Stats | `AutoARIMAForecaster`, `ARIMAForecaster` |
+| Neural | `PatchTSTForecaster`, `TimesNetForecaster` |
+
+Other forecasters (e.g., `AutoETSForecaster`, `NBEATSForecaster`) ignore
+exogenous data. If you pass `X` to a forecaster that does not support it,
+it will be silently ignored during preprocessing.
+
+## Prepare your feature DataFrames
+
+Create a polars DataFrame with a `time` column and one column per feature.
+`X_train` must have the same number of rows as `y_train`:
 
 ```python
 import polars as pl
 
-# Training features - same timesteps as y_train
 X_train = pl.DataFrame({
     "time": y_train["time"],
     "price": [...],
     "promotion": [...],
 })
-
-# Forecast-horizon features - must be known in advance
-X_test = pl.DataFrame({
-    "time": forecast_dates,
-    "price": [...],      # planned prices
-    "promotion": [...],  # planned promotions
-})
 ```
 
-`X_train` must have the same number of rows as `y_train`. `X_test` must have
-exactly `forecasting_horizon` rows.
+## Fit with exogenous features
 
-### 2. Fit with exogenous features
-
-Pass `X` to `fit`:
+Pass `X` to `fit`. The features are merged into the Nixtla long-format
+training data automatically:
 
 ```python
-from yohou_nixtla import NBEATSForecaster
+from yohou_nixtla import AutoARIMAForecaster
 
-forecaster = NBEATSForecaster(input_size=24, max_steps=500)
+forecaster = AutoARIMAForecaster(season_length=12)
 forecaster.fit(y_train, X=X_train, forecasting_horizon=12)
 ```
 
-### 3. Predict with future features
+## Predict
 
-Pass the future-horizon feature DataFrame to `predict`:
+Call `predict` with the desired horizon:
 
 ```python
-y_pred = forecaster.predict(forecasting_horizon=12, X=X_test)
+y_pred = forecaster.predict(forecasting_horizon=12)
 ```
 
-### 4. Apply feature preprocessing
+## Apply feature preprocessing
 
-If your features have different scales, apply a transformer:
+If your features have different scales, set a `feature_transformer` to
+normalize them before they reach the backend. The transformer is fit on
+`X_train` during `fit` and applied consistently at prediction time:
 
 ```python
 from sklearn.preprocessing import StandardScaler
-from yohou_nixtla import NBEATSForecaster
+from yohou_nixtla import PatchTSTForecaster
 
-forecaster = NBEATSForecaster(
+forecaster = PatchTSTForecaster(
     input_size=24,
     max_steps=500,
     feature_transformer=StandardScaler(),
 )
 forecaster.fit(y_train, X=X_train, forecasting_horizon=12)
-y_pred = forecaster.predict(forecasting_horizon=12, X=X_test)
+y_pred = forecaster.predict(forecasting_horizon=12)
 ```
 
-The `feature_transformer` is fit on training features and applied consistently
-at prediction time.
+## Panel data with exogenous features
+
+For panel (grouped) data, feature columns can be global or per-group. The
+conversion module matches them automatically:
+
+```python
+# Per-group features share the group suffix
+X_train = pl.DataFrame({
+    "time": y_train["time"],
+    "price__store_1": [...],
+    "price__store_2": [...],
+})
+
+# Global features (no __) are broadcast to all groups
+X_train = pl.DataFrame({
+    "time": y_train["time"],
+    "oil_price": [...],
+})
+```
 
 ## See Also
 
 - [Concepts](../explanation/concepts.md): exogenous feature design
-- [How to Configure Forecasters](configure.md): configure `feature_transformer` and `target_as_feature`
+- [How to Choose a Forecaster](choose-forecaster.md): which forecasters support exogenous features
 - [API Reference](../reference/api.md): `fit` and `predict` method signatures

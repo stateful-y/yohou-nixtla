@@ -12,11 +12,10 @@ Yohou uses the `__` separator in column names to signal panel (grouped) data
 (e.g., `sales__store_1`). All Yohou-Nixtla forecasters detect this convention
 automatically. See [Concepts](../explanation/concepts.md#panel-data) for details.
 
-## Steps
+## Structure your DataFrame
 
-### 1. Structure your DataFrame
-
-Create a wide-format polars DataFrame with `time` and one column per group:
+Create a wide-format polars DataFrame with `time` and one column per group.
+Column names follow the pattern `<feature>__<group>`:
 
 ```python
 import polars as pl
@@ -40,59 +39,49 @@ y = pl.DataFrame({
 })
 ```
 
-Column names follow the pattern `<feature>__<group>`. The `time` column holds
-timestamps; all other columns are treated as separate series.
+The `time` column holds timestamps; all other columns are treated as separate
+series. Each group is modeled independently by Nixtla and recombined into the
+wide format automatically.
 
-### 2. Fit the forecaster
+## Fit and predict
 
-Fit exactly as you would for a single series. The panel structure is handled
-automatically:
+Fit exactly as you would for a single series. The panel structure is detected
+from the column names:
 
 ```python
 from yohou_nixtla import AutoARIMAForecaster
 
 forecaster = AutoARIMAForecaster(season_length=12)
 forecaster.fit(y, forecasting_horizon=12)
+
+y_pred = forecaster.predict(forecasting_horizon=12)
+# y_pred columns: ["observed_time", "time", "sales__store_1", "sales__store_2"]
 ```
 
 To fit all groups in parallel, use `n_jobs=-1`:
 
 ```python
 forecaster = AutoARIMAForecaster(season_length=12, n_jobs=-1)
-forecaster.fit(y, forecasting_horizon=12)
 ```
 
-### 3. Generate predictions
+## Predict specific groups
 
-Call `predict` as normal. The output is a wide-format DataFrame with the same
-columns as the input:
+If you only need forecasts for a subset of groups, pass `panel_group_names`:
 
 ```python
-y_pred = forecaster.predict(forecasting_horizon=12)
-# y_pred columns: ["time", "sales__store_1", "sales__store_2"]
+y_pred = forecaster.predict(
+    forecasting_horizon=12,
+    panel_group_names=["store_1"],
+)
+# y_pred columns: ["observed_time", "time", "sales__store_1"]
 ```
 
-### 4. Update with new observations
+This filters the output without refitting.
 
-When new data arrives for all groups, call `observe`:
+## Handle unequal series lengths
 
-```python
-import polars as pl
-
-y_new = pl.DataFrame({
-    "time": [date(2024, 1, 1)],
-    "sales__store_1": [148],
-    "sales__store_2": [107],
-})
-
-forecaster.observe(y_new)
-y_pred = forecaster.predict(forecasting_horizon=12)
-```
-
-## Handle Unequal Series Lengths
-
-If some groups have missing data at the start, use `null` values. Nixtla fits
-each series independently, so shorter series do not affect longer ones:
+If some groups start later, use `null` values for the missing periods. Nixtla
+fits each series independently, so shorter series do not affect longer ones:
 
 ```python
 y = pl.DataFrame({
@@ -104,6 +93,29 @@ y = pl.DataFrame({
 
 Null rows at the beginning of a series are dropped before fitting.
 
+## Add exogenous features to panel data
+
+When combining panel data with exogenous features, feature columns can be
+per-group or global:
+
+```python
+# Per-group features share the group suffix
+X = pl.DataFrame({
+    "time": y["time"],
+    "price__store_1": [...],
+    "price__store_2": [...],
+})
+
+# Global features (no __) are broadcast to all groups
+X = pl.DataFrame({
+    "time": y["time"],
+    "oil_price": [...],
+})
+```
+
+Only forecasters that accept exogenous features can use this (see
+[How to Use Exogenous Features](exogenous-features.md)).
+
 !!! tip "Interactive version available"
 
     The [Forecasting Panel Data](../tutorials/examples.md) notebook lets you
@@ -112,5 +124,5 @@ Null rows at the beginning of a series are dropped before fitting.
 ## See Also
 
 - [Concepts](../explanation/concepts.md): how panel data handling works internally
-- [How to Configure Forecasters](configure.md): tune `season_length` and `n_jobs`
+- [How to Use Exogenous Features](exogenous-features.md): external regressors with panel data
 - [API Reference](../reference/api.md): forecaster parameter reference

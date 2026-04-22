@@ -2,11 +2,12 @@
 
 Solutions to common problems when using Yohou-Nixtla.
 
-## Installation Problems
+## Installation problems
 
 ### `ModuleNotFoundError: No module named 'yohou_nixtla'`
 
-You installed into a different environment than the one you are running. Verify both:
+You installed into a different environment than the one you are running.
+Verify both point to the same place:
 
 ```bash
 which python
@@ -23,7 +24,7 @@ pip install yohou-nixtla
 
 ### `ModuleNotFoundError: No module named 'neuralforecast'`
 
-Neural forecasters require the `neuralforecast` extra. Install it:
+Neural forecasters require the `neuralforecast` extra:
 
 ```bash
 uv add yohou-nixtla[neural]
@@ -31,9 +32,11 @@ uv add yohou-nixtla[neural]
 pip install yohou-nixtla[neural]
 ```
 
-## Frequency Detection Failures
+Stats forecasters only need the base install. You do not need both backends.
 
-### `ValueError: unsupported polars interval ...`
+## Frequency detection
+
+### `ValueError: Cannot map polars interval ...`
 
 The `infer_freq` utility cannot map your DataFrame's time column interval to a
 Nixtla frequency alias. Override it manually:
@@ -42,13 +45,12 @@ Nixtla frequency alias. Override it manually:
 forecaster = AutoARIMAForecaster(season_length=12, freq="MS")
 ```
 
-See the [Configuration guide](configure.md) for a
-full table of frequency aliases.
+See the [API Reference](../reference/api.md) for frequency alias details.
 
 ### Predictions are offset by one period
 
-Your frequency string may be mismatched with your data. Check the interval in
-your polars DataFrame:
+Your frequency string may not match your data's actual interval. Inspect the
+interval:
 
 ```python
 y.select(
@@ -58,12 +60,12 @@ y.select(
 
 Then set `freq` explicitly to match.
 
-## Panel Data Errors
+## Panel data
 
 ### Predictions have fewer columns than the input
 
-One or more series in your panel data may contain missing values or all-null
-periods. Nixtla drops series that cannot be fitted. Inspect your data:
+One or more series may contain all-null values. Nixtla drops series that
+cannot be fitted. Check for nulls:
 
 ```python
 y.null_count()
@@ -71,27 +73,55 @@ y.null_count()
 
 Fill missing values or remove the affected series before fitting.
 
-### Column naming convention not recognized
+### Panel structure not detected
 
-Panel column names must contain the `__` separator to signal grouping. For
-example, `sales__store_1` not `sales_store_1`. Check your column names:
-
-```python
-print(y.columns)
-```
-
-Rename columns to include `__`:
+Panel column names must contain the `__` separator (double underscore). For
+example, `sales__store_1` not `sales_store_1`. Rename columns if needed:
 
 ```python
 y = y.rename({"sales_store_1": "sales__store_1"})
 ```
 
-## Neural Forecaster Training Problems
+### `ValueError: X and y do not have the same local group names`
+
+Your exogenous feature DataFrame `X` has different group suffixes than `y`.
+The group names after the `__` separator must match. Check:
+
+```python
+print(y.columns)
+print(X.columns)
+```
+
+## Data format
+
+### `KeyError: 'time'`
+
+Yohou expects a column named exactly `time`. Rename your timestamp column:
+
+```python
+y = y.rename({"date": "time"})
+```
+
+### `ValueError: y must have at least one value column besides 'time'`
+
+Your DataFrame has only a `time` column and no value columns. Add at least
+one target series column.
+
+### "This forecaster is not fitted yet"
+
+Call `fit` before `predict` or `observe`:
+
+```python
+forecaster.fit(y, forecasting_horizon=12)
+y_pred = forecaster.predict(forecasting_horizon=12)
+```
+
+## Neural forecaster training
 
 ### Training loss is `NaN` from the first step
 
-Your data contains `NaN`, `inf`, or very large values. Normalize the target
-before fitting:
+Your data likely contains `NaN`, `inf`, or very large values. Normalize the
+target:
 
 ```python
 from sklearn.preprocessing import StandardScaler
@@ -119,7 +149,7 @@ Also verify `input_size` is at least twice the `forecasting_horizon`.
 
 ### `CUDA out of memory`
 
-Force CPU execution with `accelerator="cpu"`:
+Force CPU execution:
 
 ```python
 forecaster = NBEATSForecaster(
@@ -139,38 +169,7 @@ forecaster = NBEATSForecaster(
 )
 ```
 
-## Data Format Errors
-
-### `KeyError: 'time'`
-
-Yohou expects a column named exactly `time`. Rename your timestamp column:
-
-```python
-y = y.rename({"date": "time"})
-```
-
-### `check_is_fitted`: "This forecaster is not fitted yet"
-
-Call `fit` before `predict` or `observe`:
-
-```python
-forecaster.fit(y, forecasting_horizon=12)
-y_pred = forecaster.predict(forecasting_horizon=12)
-```
-
-## Common Questions
-
-### Can I use Nixtla forecasters in a Yohou pipeline?
-
-Yes. All Yohou-Nixtla forecasters are fully compatible with `DecompositionPipeline`,
-`ColumnForecaster`, `ForecastedFeatureForecaster`, and other Yohou meta-estimators.
-
-### Do I need to install both Nixtla backends?
-
-No. Install only the backend you need: `statsforecast` for Stats or
-`neuralforecast` for Neural forecasters.
-
-## Getting More Help
+## Getting more help
 
 - [Open an issue](https://github.com/stateful-y/yohou-nixtla/issues/new): include
   your Python version, package version (`yohou_nixtla.__version__`), and a minimal

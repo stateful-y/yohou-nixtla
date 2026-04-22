@@ -145,15 +145,13 @@ nav:
     - Examples: pages/tutorials/examples.md
   - How-to Guides:
     - Choose the Right Forecaster: pages/how-to/choose-forecaster.md
-    - Configure Forecasters: pages/how-to/configure.md
     - Work with Panel Data: pages/how-to/panel-data.md
     - Use Exogenous Features: pages/how-to/exogenous-features.md
-    - Integrate with scikit-learn: pages/how-to/integrate-sklearn.md
+    - Integrate with Yohou: pages/how-to/integrate-yohou.md
     - Troubleshooting: pages/how-to/troubleshooting.md
     - Contributing: pages/how-to/contribute.md
   - Reference:
     - API Reference: pages/reference/api.md
-    - Glossary: pages/reference/glossary.md
   - Explanation:
     - Concepts: pages/explanation/concepts.md
 
