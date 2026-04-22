@@ -50,9 +50,9 @@ class NBEATSForecaster(BaseNeuralForecaster):
 
     References
     ----------
-    .. [1] B. N. Oreshkin, D. Carpov, N. Chapados, and Y. Bengio,
-       "N-BEATS: Neural basis expansion analysis for interpretable time
-       series forecasting," ICLR, 2020.
+    [1] B. N. Oreshkin, D. Carpov, N. Chapados, and Y. Bengio,
+        "N-BEATS: Neural basis expansion analysis for interpretable time
+        series forecasting," ICLR, 2020.
 
     Examples
     --------
@@ -104,10 +104,10 @@ class NHITSForecaster(BaseNeuralForecaster):
 
     References
     ----------
-    .. [1] C. Challu, K. G. Olivares, B. N. Oreshkin, F. Garza,
-       M. Mergenthaler-Canseco, and A. Dubrawski, "N-HiTS: Neural
-       hierarchical interpolation for time series forecasting,"
-       AAAI, 2023.
+    [1] C. Challu, K. G. Olivares, B. N. Oreshkin, F. Garza,
+        M. Mergenthaler-Canseco, and A. Dubrawski, "N-HiTS: Neural
+        hierarchical interpolation for time series forecasting,"
+        AAAI, 2023.
 
     Examples
     --------
@@ -206,9 +206,9 @@ class PatchTSTForecaster(BaseNeuralForecaster):
 
     References
     ----------
-    .. [1] Y. Nie, N. H. Nguyen, P. Sinthong, and J. Kalagnanam,
-       "A time series is worth 64 words: Long-term forecasting with
-       transformers," ICLR, 2023.
+    [1] Y. Nie, N. H. Nguyen, P. Sinthong, and J. Kalagnanam,
+        "A time series is worth 64 words: Long-term forecasting with
+        transformers," ICLR, 2023.
 
     Examples
     --------
@@ -267,9 +267,9 @@ class TimesNetForecaster(BaseNeuralForecaster):
 
     References
     ----------
-    .. [1] H. Wu, T. Hu, Y. Liu, H. Zhou, J. Wang, and M. Long,
-       "TimesNet: Temporal 2D-variation modeling for general time
-       series analysis," ICLR, 2023.
+    [1] H. Wu, T. Hu, Y. Liu, H. Zhou, J. Wang, and M. Long,
+        "TimesNet: Temporal 2D-variation modeling for general time
+        series analysis," ICLR, 2023.
 
     Examples
     --------
