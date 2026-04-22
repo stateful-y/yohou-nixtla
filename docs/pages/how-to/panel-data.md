@@ -66,12 +66,12 @@ forecaster = AutoARIMAForecaster(season_length=12, n_jobs=-1)
 
 ## Predict specific groups
 
-If you only need forecasts for a subset of groups, pass `panel_group_names`:
+If you only need forecasts for a subset of groups, pass `groups`:
 
 ```python
 y_pred = forecaster.predict(
     forecasting_horizon=12,
-    panel_group_names=["store_1"],
+    groups=["store_1"],
 )
 # y_pred columns: ["observed_time", "time", "sales__store_1"]
 ```

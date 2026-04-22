@@ -30,13 +30,15 @@ def _():
 
 @app.cell(hide_code=True)
 def _():
+    from datetime import datetime
+
     import numpy as np
     import plotly.graph_objects as go
+    import polars as pl
 
-    from yohou.datasets import load_air_passengers
     from yohou_nixtla.stats import AutoARIMAForecaster, AutoETSForecaster, SeasonalNaiveForecaster
 
-    return (AutoARIMAForecaster, AutoETSForecaster, SeasonalNaiveForecaster, go, load_air_passengers, np)
+    return (AutoARIMAForecaster, AutoETSForecaster, SeasonalNaiveForecaster, datetime, go, np, pl)
 
 
 @app.cell(hide_code=True)
@@ -68,14 +70,26 @@ def _(mo):
 
 
 @app.cell
-def _(load_air_passengers):
-    y = load_air_passengers()
+def _(datetime, np, pl):
+    # Generate synthetic monthly airline-style data (trend + seasonality)
+    rng = np.random.default_rng(42)
+    n = 144
+    time = pl.datetime_range(
+        start=datetime(1949, 1, 1),
+        end=datetime(1960, 12, 1),
+        interval="1mo",
+        eager=True,
+    )
+    trend = np.linspace(100, 500, n)
+    season = 40 * np.sin(2 * np.pi * np.arange(n) / 12)
+    noise = rng.normal(0, 10, n)
+    y = pl.DataFrame({"time": time, "passengers": trend + season + noise})
 
     # Split: train on first 120, test on last 24
     y_train = y[:120]
     y_test = y[120:]
 
-    target_col = [c for c in y.columns if c != "time"][0]
+    target_col = "passengers"
     return (target_col, y, y_test, y_train)
 
 

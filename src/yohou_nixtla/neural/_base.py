@@ -224,7 +224,7 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
         self,
         X: pl.DataFrame | None = None,
         forecasting_horizon: int | None = None,
-        panel_group_names: list[str] | None = None,
+        groups: list[str] | None = None,
         predict_transformed: bool = False,
         **params,
     ) -> pl.DataFrame:
@@ -240,7 +240,7 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
             Future exogenous features.
         forecasting_horizon : int or None, default=None
             Number of steps to forecast. If None, uses the horizon from fit.
-        panel_group_names : list of str or None, default=None
+        groups : list of str or None, default=None
             Panel groups to predict.
         predict_transformed : bool, default=False
             Whether to return transformed predictions.
@@ -258,7 +258,7 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
         y_pred = super().predict(
             X=X,
             forecasting_horizon=self.fit_forecasting_horizon_,
-            panel_group_names=panel_group_names,
+            groups=groups,
             predict_transformed=predict_transformed,
             **params,
         )

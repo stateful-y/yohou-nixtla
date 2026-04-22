@@ -76,12 +76,7 @@ class AutoARIMAForecaster(BaseStatsForecaster):
 
     _estimator_default_class = AutoARIMA
 
-    def __sklearn_tags__(self):
-        """Get estimator tags (supports exogenous features)."""
-        tags = super().__sklearn_tags__()
-        assert tags.forecaster_tags is not None
-        tags.forecaster_tags.ignores_exogenous = False
-        return tags
+    _tags = {"ignores_exogenous": False}
 
 
 class AutoETSForecaster(BaseStatsForecaster):
@@ -356,12 +351,7 @@ class ARIMAForecaster(BaseStatsForecaster):
 
     _estimator_default_class = ARIMA
 
-    def __sklearn_tags__(self):
-        """Get estimator tags (supports exogenous features)."""
-        tags = super().__sklearn_tags__()
-        assert tags.forecaster_tags is not None
-        tags.forecaster_tags.ignores_exogenous = False
-        return tags
+    _tags = {"ignores_exogenous": False}
 
 
 class HoltWintersForecaster(BaseStatsForecaster):
