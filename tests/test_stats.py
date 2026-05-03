@@ -434,7 +434,7 @@ class TestPanelData:
         })
         forecaster = NaiveForecaster()
         with pytest.raises(ValueError, match="do not have the same local group names"):
-            forecaster.fit(y, X, forecasting_horizon=3)
+            forecaster.fit(y, X_actual=X, forecasting_horizon=3)
 
     def test_panel_fit_with_matching_exogenous(self):
         """Panel X with matching group names is accepted without error."""
@@ -458,7 +458,7 @@ class TestPanelData:
             "group_1__feature": list(range(60, 120)),
         })
         forecaster = NaiveForecaster()
-        forecaster.fit(y, X, forecasting_horizon=3)
+        forecaster.fit(y, X_actual=X, forecasting_horizon=3)
         y_pred = forecaster.predict()
         assert len(y_pred) == 3
 

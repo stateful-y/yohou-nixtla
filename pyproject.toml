@@ -207,6 +207,7 @@ fail_under = 100
 include_namespace_packages = true
 
 [tool.uv]
+sources = { yohou = { workspace = true } }
 # Windows wheels for `ray` (a neuralforecast dependency) are only available
 # for Python < 3.13.  Restrict lock-file resolution on Windows accordingly so
 # `uv lock` never tries to include a win_amd64 + cp313 wheel that doesn't exist.

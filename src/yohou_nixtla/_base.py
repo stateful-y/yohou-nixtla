@@ -179,6 +179,8 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         y: pl.DataFrame,
         X: pl.DataFrame | None = None,
         forecasting_horizon: int = 1,
+        X_future: pl.DataFrame | None = None,
+        X_forecast: pl.DataFrame | None = None,
     ) -> tuple[
         pl.DataFrame,
         pl.DataFrame | None,
@@ -201,6 +203,10 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
             Feature time series.
         forecasting_horizon : int
             Number of steps to forecast.
+        X_future : pl.DataFrame or None, default=None
+            Known future features.
+        X_forecast : pl.DataFrame or None, default=None
+            External forecasts.
 
         Returns
         -------
@@ -229,8 +235,11 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
     def fit(
         self,
         y: pl.DataFrame,
-        X: pl.DataFrame | None = None,
+        X_actual: pl.DataFrame | None = None,
         forecasting_horizon: int = 1,
+        *,
+        X_future: pl.DataFrame | None = None,
+        X_forecast: pl.DataFrame | None = None,
         **params,
     ) -> Self:
         """Fit the Nixtla forecaster to the training data.
@@ -247,10 +256,16 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         ----------
         y : pl.DataFrame
             Target time series with ``time`` column.
-        X : pl.DataFrame or None, default=None
-            Exogenous features with ``time`` column.
+        X_actual : pl.DataFrame or None, default=None
+            Actual observation features with ``time`` column.
         forecasting_horizon : int, default=1
             Number of steps to forecast.
+        X_future : pl.DataFrame or None, default=None
+            Known future features with ``time`` column. Mapped to
+            nixtla's ``futr_exog``.
+        X_forecast : pl.DataFrame or None, default=None
+            Not supported by Nixtla backends. Raises ``ValueError``
+            if provided.
         **params : dict
             Additional metadata routing parameters.
 
@@ -262,14 +277,24 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         Raises
         ------
         ValueError
-            If ``forecasting_horizon < 1``.
+            If ``forecasting_horizon < 1`` or ``X_forecast`` is provided.
 
         """
         if forecasting_horizon < 1:
             raise ValueError(f"forecasting_horizon must be a positive integer, got {forecasting_horizon}.")
 
+        if X_forecast is not None:
+            raise ValueError(
+                "Nixtla backends do not support X_forecast (external forecasts "
+                "with vintage_time). Use X_actual for observation features or "
+                "X_future for known future features instead."
+            )
+
         # 1. Yohou preprocessing: validation, panel detection, transformer fitting
-        y_t, X_t = self._pre_fit(y=y, X=X, forecasting_horizon=forecasting_horizon)
+        y_t, X_t = self._pre_fit(
+            y=y, X=X_actual, forecasting_horizon=forecasting_horizon,
+            X_future=X_future, X_forecast=None,
+        )
 
         # 2. Reassemble panel dicts back to wide DataFrames
         y_wide = dict_to_panel(y_t)
@@ -306,7 +331,9 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
 
     def predict(
         self,
-        X: pl.DataFrame | None = None,
+        *,
+        X_future: pl.DataFrame | None = None,
+        X_forecast: pl.DataFrame | None = None,
         forecasting_horizon: int | None = None,
         groups: list[str] | None = None,
         predict_transformed: bool = False,
@@ -314,7 +341,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
     ) -> pl.DataFrame:
         """Generate point forecasts.
 
-        Overrides yohou's recursive prediction loop -- Nixtla backends
+        Overrides yohou's recursive prediction loop. Nixtla backends
         natively handle multi-step horizons, so the backend is called
         directly with the requested horizon.
 
@@ -324,8 +351,10 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
 
         Parameters
         ----------
-        X : pl.DataFrame or None, default=None
-            Future exogenous features.
+        X_future : pl.DataFrame or None, default=None
+            Known future features. Mapped to nixtla's ``futr_exog``.
+        X_forecast : pl.DataFrame or None, default=None
+            Not supported. Raises ``ValueError`` if provided.
         forecasting_horizon : int or None, default=None
             Number of steps to forecast. If None, uses the horizon from fit.
         groups : list of str or None, default=None
@@ -340,8 +369,19 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         pl.DataFrame
             Point forecasts with ``observed_time`` and ``time`` columns.
 
+        Raises
+        ------
+        ValueError
+            If ``X_forecast`` is provided.
+
         """
         check_is_fitted(self, ["nixtla_forecaster_", "y_columns_"])
+
+        if X_forecast is not None:
+            raise ValueError(
+                "Nixtla backends do not support X_forecast. "
+                "Use X_future for known future features instead."
+            )
 
         # Validate and normalize groups
         groups = check_groups(self.groups_, groups)
@@ -349,7 +389,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         h = forecasting_horizon if forecasting_horizon is not None else self.fit_forecasting_horizon_
 
         # Call backend (always predicts all groups for batch efficiency)
-        forecast_df = self._predict_backend(h, X)
+        forecast_df = self._predict_backend(h, X_future)
 
         # Convert back to yohou format (time + value columns)
         y_pred = nixtla_to_yohou(
@@ -376,15 +416,15 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         return select_panel_columns(result, groups, include_global=True)
 
     @abc.abstractmethod
-    def _predict_backend(self, forecasting_horizon: int, X: pl.DataFrame | None = None) -> Any:
+    def _predict_backend(self, forecasting_horizon: int, X_future: pl.DataFrame | None = None) -> Any:
         """Generate raw predictions from the backend orchestrator.
 
         Parameters
         ----------
         forecasting_horizon : int
             Number of steps to forecast.
-        X : pl.DataFrame or None, default=None
-            Future exogenous features (already in yohou format).
+        X_future : pl.DataFrame or None, default=None
+            Known future features (already in yohou format).
 
         Returns
         -------
