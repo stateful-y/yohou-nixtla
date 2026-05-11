@@ -105,6 +105,8 @@ COPILOT_INSTRUCTIONS.md
 copilot-instructions.md
 copilot-config.md
 copilot-prompt.md
+.github/skills
+.github/prompts
 
 # ChatGPT / OpenAI
 CHATGPT.md
@@ -138,6 +140,7 @@ llm-instructions/
 .cursor/
 .aider*
 .continue/
+openspec/
 
 # Pytorch-Lightning
 lightning_logs/
