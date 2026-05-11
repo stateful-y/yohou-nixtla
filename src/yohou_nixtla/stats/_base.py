@@ -121,15 +121,16 @@ class BaseStatsForecaster(BaseNixtlaForecaster):
         sf.fit(df=nixtla_df)
         self.nixtla_forecaster_ = sf
 
-    def _predict_backend(self, forecasting_horizon: int, X_future: pl.DataFrame | None = None) -> Any:
+    def _predict_backend(self, forecasting_horizon: int, X_future: Any = None) -> Any:
         """Generate raw predictions from the StatsForecast orchestrator.
 
         Parameters
         ----------
         forecasting_horizon : int
             Number of steps to forecast.
-        X_future : pl.DataFrame or None, default=None
-            Known future features (unused by stats models).
+        X_future : pd.DataFrame or None, default=None
+            Known future features in Nixtla long format, passed as
+            ``X_df`` to ``StatsForecast.predict()``.
 
         Returns
         -------
@@ -138,4 +139,4 @@ class BaseStatsForecaster(BaseNixtlaForecaster):
 
         """
         check_is_fitted(self, ["nixtla_forecaster_"])
-        return self.nixtla_forecaster_.predict(h=forecasting_horizon)
+        return self.nixtla_forecaster_.predict(h=forecasting_horizon, X_df=X_future)

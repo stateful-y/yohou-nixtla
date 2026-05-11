@@ -174,11 +174,40 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
         if forecasting_horizon < 1:
             raise ValueError(f"forecasting_horizon must be a positive integer, got {forecasting_horizon}.")
 
+        if X_future is not None and not self._get_tag("supports_exogenous"):
+            raise ValueError(
+                f"{type(self).__name__} does not support exogenous features "
+                f"(X_future). Use a model that supports exogenous features, "
+                f"such as AutoARIMAForecaster or NHITSForecaster."
+            )
+
         # Inject h, input_size, and max_steps into model params before
         # instantiation. neuralforecast models require h at construction.
         self.params["h"] = forecasting_horizon
         self.params["input_size"] = self.input_size
         self.params["max_steps"] = self.max_steps
+
+        # Inject futr_exog_list if X_future is provided, so the model
+        # knows which columns are future exogenous at construction time.
+        if X_future is not None:
+            futr_cols = [c for c in X_future.columns if c != "time"]
+            from yohou.utils.panel import inspect_panel
+
+            _, panel_groups = inspect_panel(X_future)
+            if panel_groups:
+                # Deduplicate: extract unique variable names from panel columns
+                seen: set[str] = set()
+                futr_exog_names: list[str] = []
+                for c in futr_cols:
+                    parts = c.split("__", 1)
+                    var_name = parts[1] if len(parts) == 2 else c
+                    if var_name not in seen:
+                        seen.add(var_name)
+                        futr_exog_names.append(var_name)
+                self.params["futr_exog_list"] = futr_exog_names
+            else:
+                self.params["futr_exog_list"] = futr_cols
+
         self.instantiate()
 
         return super().fit(
@@ -210,7 +239,7 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
         nf.fit(df=nixtla_df)
         self.nixtla_forecaster_ = nf
 
-    def _predict_backend(self, forecasting_horizon: int, X_future: pl.DataFrame | None = None) -> Any:
+    def _predict_backend(self, forecasting_horizon: int, X_future: Any = None) -> Any:
         """Generate raw predictions from the NeuralForecast orchestrator.
 
         Neural models always predict exactly ``h`` steps (the horizon set
@@ -221,8 +250,9 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
         ----------
         forecasting_horizon : int
             Number of steps to forecast.
-        X_future : pl.DataFrame or None, default=None
-            Known future features (unused currently).
+        X_future : pd.DataFrame or None, default=None
+            Known future features in Nixtla long format, passed as
+            ``futr_df`` to ``NeuralForecast.predict()``.
 
         Returns
         -------
@@ -231,7 +261,7 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
 
         """
         check_is_fitted(self, ["nixtla_forecaster_"])
-        return self.nixtla_forecaster_.predict()
+        return self.nixtla_forecaster_.predict(futr_df=X_future)
 
     def predict(
         self,

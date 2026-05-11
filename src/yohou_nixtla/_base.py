@@ -28,7 +28,13 @@ from yohou.utils.panel import dict_to_panel, inspect_panel, select_panel_columns
 from yohou.utils.validate_data import validate_forecaster_data
 from yohou.utils.validation import check_groups
 
-from yohou_nixtla._conversion import infer_freq, nixtla_to_yohou, yohou_to_nixtla
+from yohou_nixtla._conversion import (
+    _add_exogenous,
+    infer_freq,
+    nixtla_to_yohou,
+    x_future_to_nixtla,
+    yohou_to_nixtla,
+)
 
 __all__ = ["BaseNixtlaForecaster"]
 
@@ -158,7 +164,14 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         super().set_params(**params)
         return self
 
-    _tags = {"uses_reduction": False, "requires_exogenous": False}
+    _tags = {"uses_reduction": False, "requires_exogenous": False, "supports_exogenous": False}
+
+    def _get_tag(self, tag_name: str) -> Any:
+        """Read a tag value from the merged ``_tags`` dicts in the MRO."""
+        for cls in type(self).__mro__:
+            if "_tags" in cls.__dict__ and tag_name in cls.__dict__["_tags"]:
+                return cls.__dict__["_tags"][tag_name]
+        return None
 
     def __sklearn_tags__(self):
         """Get estimator tags, applying ``_tags`` overrides from the class hierarchy."""
@@ -282,6 +295,13 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         if forecasting_horizon < 1:
             raise ValueError(f"forecasting_horizon must be a positive integer, got {forecasting_horizon}.")
 
+        if X_future is not None and not self._get_tag("supports_exogenous"):
+            raise ValueError(
+                f"{type(self).__name__} does not support exogenous features "
+                f"(X_future). Use a model that supports exogenous features, "
+                f"such as AutoARIMAForecaster or NHITSForecaster."
+            )
+
         if X_forecast is not None:
             raise ValueError(
                 "Nixtla backends do not support X_forecast (external forecasts "
@@ -290,11 +310,13 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
             )
 
         # 1. Yohou preprocessing: validation, panel detection, transformer fitting
+        # Pass X_future=None to _pre_fit to bypass step column derivation;
+        # Nixtla expects raw feature column names, not step columns.
         y_t, X_t = self._pre_fit(
             y=y,
             X_actual=X_actual,
             forecasting_horizon=forecasting_horizon,
-            X_future=X_future,
+            X_future=None,
             X_forecast=None,
         )
 
@@ -312,7 +334,14 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         # 5. Convert to Nixtla long format
         nixtla_df = yohou_to_nixtla(y_wide, X_wide)
 
-        # 6. Delegate to backend
+        # 6. Merge raw X_future columns into training DataFrame
+        if X_future is not None:
+            nixtla_df = _add_exogenous(nixtla_df, X_future, self.y_columns_)
+            self.futr_exog_columns_ = [c for c in X_future.columns if c != "time"]
+        else:
+            self.futr_exog_columns_ = []
+
+        # 7. Delegate to backend
         self._fit_backend(nixtla_df, forecasting_horizon)
 
         return self
@@ -378,6 +407,13 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         """
         check_is_fitted(self, ["nixtla_forecaster_", "y_columns_"])
 
+        if X_future is not None and not self._get_tag("supports_exogenous"):
+            raise ValueError(
+                f"{type(self).__name__} does not support exogenous features "
+                f"(X_future). Use a model that supports exogenous features, "
+                f"such as AutoARIMAForecaster or NHITSForecaster."
+            )
+
         if X_forecast is not None:
             raise ValueError(
                 "Nixtla backends do not support X_forecast. Use X_future for known future features instead."
@@ -388,8 +424,18 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
 
         h = forecasting_horizon if forecasting_horizon is not None else self.fit_forecasting_horizon_
 
+        # Convert X_future to Nixtla format for predict
+        nixtla_X_future = None
+        if X_future is not None and self.futr_exog_columns_:
+            x_cols = [c for c in X_future.columns if c != "time"]
+            if sorted(x_cols) != sorted(self.futr_exog_columns_):
+                raise ValueError(
+                    f"X_future columns {x_cols} do not match the columns used during fit: {self.futr_exog_columns_}."
+                )
+            nixtla_X_future = x_future_to_nixtla(X_future, self.y_columns_)
+
         # Call backend (always predicts all groups for batch efficiency)
-        forecast_df = self._predict_backend(h, X_future)
+        forecast_df = self._predict_backend(h, nixtla_X_future)
 
         # Convert back to yohou format (time + value columns)
         y_pred = nixtla_to_yohou(
@@ -416,15 +462,15 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         return select_panel_columns(result, groups, include_global=True)
 
     @abc.abstractmethod
-    def _predict_backend(self, forecasting_horizon: int, X_future: pl.DataFrame | None = None) -> Any:
+    def _predict_backend(self, forecasting_horizon: int, X_future: Any = None) -> Any:
         """Generate raw predictions from the backend orchestrator.
 
         Parameters
         ----------
         forecasting_horizon : int
             Number of steps to forecast.
-        X_future : pl.DataFrame or None, default=None
-            Known future features (already in yohou format).
+        X_future : pd.DataFrame or None, default=None
+            Known future features in Nixtla long format.
 
         Returns
         -------
