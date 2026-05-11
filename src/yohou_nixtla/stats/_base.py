@@ -67,7 +67,6 @@ class BaseStatsForecaster(BaseNixtlaForecaster):
         y: pl.DataFrame,
         X_actual: pl.DataFrame | None = None,
         forecasting_horizon: int = 1,
-        *,
         X_future: pl.DataFrame | None = None,
         X_forecast: pl.DataFrame | None = None,
         **params,
@@ -96,8 +95,12 @@ class BaseStatsForecaster(BaseNixtlaForecaster):
 
         """
         return super().fit(
-            y=y, X_actual=X_actual, forecasting_horizon=forecasting_horizon,
-            X_future=X_future, X_forecast=X_forecast, **params,
+            y=y,
+            X_actual=X_actual,
+            forecasting_horizon=forecasting_horizon,
+            X_future=X_future,
+            X_forecast=X_forecast,
+            **params,
         )
 
     def _fit_backend(self, nixtla_df: Any, forecasting_horizon: int) -> None:

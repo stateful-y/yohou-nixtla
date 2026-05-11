@@ -591,19 +591,19 @@ class TestIgnoresExogenous:
             pytest.skip(f"{neural_cls.__name__} supports exogenous")
         forecaster = neural_cls()
         tags = forecaster.__sklearn_tags__()
-        assert tags.forecaster_tags.ignores_exogenous is True
+        assert tags.forecaster_tags.requires_exogenous is False
 
     def test_patchtst_supports_exogenous(self):
         """PatchTST should support exogenous features."""
         forecaster = PatchTSTForecaster()
         tags = forecaster.__sklearn_tags__()
-        assert tags.forecaster_tags.ignores_exogenous is False
+        assert tags.forecaster_tags.requires_exogenous is True
 
     def test_timesnet_supports_exogenous(self):
         """TimesNet should support exogenous features."""
         forecaster = TimesNetForecaster()
         tags = forecaster.__sklearn_tags__()
-        assert tags.forecaster_tags.ignores_exogenous is False
+        assert tags.forecaster_tags.requires_exogenous is True
 
 
 class TestFitValidation:

@@ -221,7 +221,7 @@ class PatchTSTForecaster(BaseNeuralForecaster):
 
     _estimator_default_class = PatchTST
 
-    _tags = {"ignores_exogenous": False}
+    _tags = {"requires_exogenous": True}
 
 
 class TimesNetForecaster(BaseNeuralForecaster):
@@ -277,4 +277,4 @@ class TimesNetForecaster(BaseNeuralForecaster):
 
     _estimator_default_class = TimesNet
 
-    _tags = {"ignores_exogenous": False}
+    _tags = {"requires_exogenous": True}

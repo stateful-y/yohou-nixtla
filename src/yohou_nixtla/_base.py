@@ -158,7 +158,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         super().set_params(**params)
         return self
 
-    _tags = {"uses_reduction": False, "ignores_exogenous": True}
+    _tags = {"uses_reduction": False, "requires_exogenous": False}
 
     def __sklearn_tags__(self):
         """Get estimator tags, applying ``_tags`` overrides from the class hierarchy."""
@@ -177,7 +177,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
     def _validate_pre_fit(
         self,
         y: pl.DataFrame,
-        X: pl.DataFrame | None = None,
+        X_actual: pl.DataFrame | None = None,
         forecasting_horizon: int = 1,
         X_future: pl.DataFrame | None = None,
         X_forecast: pl.DataFrame | None = None,
@@ -190,16 +190,16 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         """Validate pre-fit inputs without requiring X for exogenous models.
 
         Nixtla backends manage their own feature engineering (lags,
-        exogenous columns) internally, so ``X`` is always optional
+        exogenous columns) internally, so ``X_actual`` is always optional
         regardless of ``ignores_exogenous``.  This override skips the
-        two ``target_as_feature``/``X`` checks that the base class
+        two ``target_as_feature``/``X_actual`` checks that the base class
         enforces.
 
         Parameters
         ----------
         y : pl.DataFrame
             Target time series.
-        X : pl.DataFrame or None
+        X_actual : pl.DataFrame or None
             Feature time series.
         forecasting_horizon : int
             Number of steps to forecast.
@@ -212,32 +212,31 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         -------
         y : pl.DataFrame
             Validated target.
-        X : pl.DataFrame or None
+        X_actual : pl.DataFrame or None
             Validated features.
         y_panel_groups : dict[str, list[str]]
             Panel groups from ``y``.
         X_panel_groups : dict[str, list[str]] or None
-            Panel groups from ``X``.
+            Panel groups from ``X_actual``.
 
         """
-        y, X, _ = validate_forecaster_data(self, y, X, reset=True)
+        y, X_actual, _ = validate_forecaster_data(self, y, X_actual, reset=True)
         self.fit_forecasting_horizon_ = forecasting_horizon
 
         _, y_panel_groups = inspect_panel(y)
         X_panel_groups = None
-        if X is not None:
-            _, X_panel_groups = inspect_panel(X)
+        if X_actual is not None:
+            _, X_panel_groups = inspect_panel(X_actual)
             if len(X_panel_groups) and list(X_panel_groups.keys()) != list(y_panel_groups.keys()):
-                raise ValueError("`X` and `y` do not have the same local group names.")
+                raise ValueError("`X_actual` and `y` do not have the same local group names.")
 
-        return y, X, y_panel_groups, X_panel_groups
+        return y, X_actual, y_panel_groups, X_panel_groups
 
     def fit(
         self,
         y: pl.DataFrame,
         X_actual: pl.DataFrame | None = None,
         forecasting_horizon: int = 1,
-        *,
         X_future: pl.DataFrame | None = None,
         X_forecast: pl.DataFrame | None = None,
         **params,
@@ -292,8 +291,11 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
 
         # 1. Yohou preprocessing: validation, panel detection, transformer fitting
         y_t, X_t = self._pre_fit(
-            y=y, X=X_actual, forecasting_horizon=forecasting_horizon,
-            X_future=X_future, X_forecast=None,
+            y=y,
+            X_actual=X_actual,
+            forecasting_horizon=forecasting_horizon,
+            X_future=X_future,
+            X_forecast=None,
         )
 
         # 2. Reassemble panel dicts back to wide DataFrames
@@ -331,7 +333,6 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
 
     def predict(
         self,
-        *,
         X_future: pl.DataFrame | None = None,
         X_forecast: pl.DataFrame | None = None,
         forecasting_horizon: int | None = None,
@@ -379,8 +380,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
 
         if X_forecast is not None:
             raise ValueError(
-                "Nixtla backends do not support X_forecast. "
-                "Use X_future for known future features instead."
+                "Nixtla backends do not support X_forecast. Use X_future for known future features instead."
             )
 
         # Validate and normalize groups

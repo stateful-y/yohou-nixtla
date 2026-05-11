@@ -76,7 +76,7 @@ class AutoARIMAForecaster(BaseStatsForecaster):
 
     _estimator_default_class = AutoARIMA
 
-    _tags = {"ignores_exogenous": False}
+    _tags = {"requires_exogenous": True}
 
 
 class AutoETSForecaster(BaseStatsForecaster):
@@ -351,7 +351,7 @@ class ARIMAForecaster(BaseStatsForecaster):
 
     _estimator_default_class = ARIMA
 
-    _tags = {"ignores_exogenous": False}
+    _tags = {"requires_exogenous": True}
 
 
 class HoltWintersForecaster(BaseStatsForecaster):
