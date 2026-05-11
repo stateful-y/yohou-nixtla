@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.1.0-alpha.4] - 2026-05-11
+
+This **minor release** includes 2 commits.
+
+
+### Features
+- Update API from X to X_actual, add X_future and X_forecast support  ([#21](https://github.com/stateful-y/yohou-nixtla/pull/21)) by @gtauzin
+
+### Miscellaneous Tasks
+- Drop Python 3.14 from nightly matrix  ([#20](https://github.com/stateful-y/yohou-nixtla/pull/20)) by @gtauzin
+
+### Contributors
+
+Thanks to all contributors for this release:
+- @gtauzin
+
 ## [0.1.0-alpha.3] - 2026-04-22
 
 This **minor release** includes 2 commits.
