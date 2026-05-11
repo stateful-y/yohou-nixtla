@@ -23,7 +23,7 @@ import polars as pl
 from yohou.utils.panel import inspect_panel
 from yohou.utils.validation import check_interval_consistency
 
-__all__ = ["infer_freq", "yohou_to_nixtla", "nixtla_to_yohou"]
+__all__ = ["infer_freq", "yohou_to_nixtla", "nixtla_to_yohou", "x_future_to_nixtla", "_add_exogenous"]
 
 # Mapping from polars interval strings to pandas offset aliases.
 # Covers the most common time series frequencies.
@@ -360,3 +360,77 @@ def nixtla_to_yohou(
         )
 
     return result
+
+
+def x_future_to_nixtla(
+    X_future: pl.DataFrame,
+    y_columns: list[str],
+) -> pd.DataFrame:
+    """Convert X_future from yohou polars wide format to Nixtla predict format.
+
+    At predict time, Nixtla backends expect a pandas DataFrame with
+    ``unique_id``, ``ds``, and feature columns. This function converts
+    the yohou polars X_future DataFrame to that format.
+
+    For panel data, feature columns are matched to ``y_columns`` by
+    prefix or suffix using the ``__`` separator. For global (non-panel)
+    data, features are broadcast to all ``y_columns``.
+
+    Parameters
+    ----------
+    X_future : pl.DataFrame
+        Known future features with ``time`` column and feature columns.
+    y_columns : list of str
+        Target column names from training, used as ``unique_id``
+        values and align panel structure.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with ``unique_id``, ``ds``, and feature columns.
+
+    """
+    x_cols = [c for c in X_future.columns if c != "time"]
+    if not x_cols:
+        raise ValueError("X_future must have at least one feature column besides 'time'.")
+
+    _, x_panel_groups = inspect_panel(X_future)
+
+    if x_panel_groups:
+        # Panel data: align X_future columns to y unique_ids
+        records: list[pd.DataFrame] = []
+        for uid in y_columns:
+            if "__" not in uid:
+                continue
+            prefix = uid.split("__", 1)[0]
+            suffix = uid.split("__", 1)[1]
+
+            uid_df = pd.DataFrame({
+                "unique_id": uid,
+                "ds": X_future.select("time").to_pandas()["time"],
+            })
+
+            # Strategy 1: prefix matching
+            matching_x_cols = [c for c in x_cols if c.startswith(f"{prefix}__")]
+            if matching_x_cols:
+                for xc in matching_x_cols:
+                    x_suffix = xc.split("__", 1)[1]
+                    uid_df[x_suffix] = X_future.get_column(xc).to_pandas().values
+            else:
+                # Strategy 2: suffix matching
+                matching_x_cols = [c for c in x_cols if c.endswith(f"__{suffix}")]
+                for xc in matching_x_cols:
+                    x_prefix = xc.split("__", 1)[0]
+                    uid_df[x_prefix] = X_future.get_column(xc).to_pandas().values
+
+            records.append(uid_df)
+        return pd.concat(records, ignore_index=True)
+    else:
+        # Global data: broadcast X_future to all unique_ids
+        x_pandas = X_future.to_pandas().rename(columns={"time": "ds"})
+        records = []
+        for uid in y_columns:
+            uid_df = x_pandas.copy()
+            uid_df["unique_id"] = uid
+            records.append(uid_df)
+        return pd.concat(records, ignore_index=True)

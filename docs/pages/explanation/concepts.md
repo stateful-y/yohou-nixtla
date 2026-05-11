@@ -92,15 +92,37 @@ override `__sklearn_tags__` for exogenous feature support.
 
 ## Exogenous feature support
 
-Not all forecasters accept external regressors. By default, the base class
-tags forecasters as ignoring exogenous features. Only four forecasters override
-this: `AutoARIMAForecaster`, `ARIMAForecaster` (Stats), and
-`PatchTSTForecaster`, `TimesNetForecaster` (Neural).
+Yohou's `BasePointForecaster` defines three exogenous inputs: `X_actual`
+(historical observations only), `X_future` (known for future time steps), and
+`X_forecast` (vintage-time forecasts). Nixtla backends only support `X_future`,
+which maps to statsforecast's `X_df` and neuralforecast's `futr_exog_list`/`futr_df`.
 
-The exogenous data flows through the same conversion pipeline as the target.
-During `fit`, exogenous columns are merged into the Nixtla long-format
-DataFrame alongside the target. Yohou's `feature_transformer` applies
-preprocessing (scaling, encoding) before the data reaches the backend.
+Not all forecasters accept external regressors. Each forecaster declares a
+`supports_exogenous` tag. Passing `X_future` to a forecaster that does not
+support it raises a `ValueError` immediately, rather than failing silently
+deep in the backend. Seven forecasters currently support exogenous features:
+`AutoARIMAForecaster`, `ARIMAForecaster`, `HoltWintersForecaster` (Stats), and
+`NHITSForecaster`, `MLPForecaster`, `PatchTSTForecaster`, `TimesNetForecaster`
+(Neural).
+
+The integration bypasses yohou's step column derivation entirely. Yohou
+normally pivots `X_future` into step columns (`col_step_1`, `col_step_2`, ...),
+which makes sense for its recursive prediction loop. Nixtla backends handle
+multi-step prediction natively, so they expect raw feature columns to remain
+consistent between training and prediction. The fit method passes
+`X_future=None` to yohou's `_pre_fit` (preventing step column creation), then
+merges the raw `X_future` columns into the Nixtla training DataFrame directly.
+
+At predict time, the forecaster validates that `X_future` contains the same
+feature columns that were present during training, converts the polars
+DataFrame to Nixtla's expected format, and passes it to the backend's predict
+call. The `x_future_to_nixtla` conversion handles both single-series and panel
+data layouts automatically.
+
+`X_forecast` is explicitly rejected. Nixtla has no equivalent concept for
+vintage-time exogenous features, and silently ignoring this parameter would
+hide a configuration error. Passing `X_forecast` to any Nixtla forecaster
+raises a `ValueError` with a clear message.
 
 ## Limitations
 

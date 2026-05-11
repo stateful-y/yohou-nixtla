@@ -434,7 +434,7 @@ class TestPanelData:
         })
         forecaster = NaiveForecaster()
         with pytest.raises(ValueError, match="do not have the same local group names"):
-            forecaster.fit(y, X, forecasting_horizon=3)
+            forecaster.fit(y, X_actual=X, forecasting_horizon=3)
 
     def test_panel_fit_with_matching_exogenous(self):
         """Panel X with matching group names is accepted without error."""
@@ -458,7 +458,7 @@ class TestPanelData:
             "group_1__feature": list(range(60, 120)),
         })
         forecaster = NaiveForecaster()
-        forecaster.fit(y, X, forecasting_horizon=3)
+        forecaster.fit(y, X_actual=X, forecasting_horizon=3)
         y_pred = forecaster.predict()
         assert len(y_pred) == 3
 
@@ -782,49 +782,49 @@ class TestTransformerIntegration:
 
 
 class TestIgnoresExogenous:
-    """Tests for per-model ignores_exogenous tags."""
+    """Tests for per-model requires_exogenous tags."""
 
     def test_naive_ignores_exogenous(self):
         """Naive models should ignore exogenous features."""
         forecaster = NaiveForecaster()
         tags = forecaster.__sklearn_tags__()
-        assert tags.forecaster_tags.ignores_exogenous is True
+        assert tags.forecaster_tags.requires_exogenous is False
 
     def test_seasonal_naive_ignores_exogenous(self):
         """Seasonal naive should ignore exogenous features."""
         forecaster = SeasonalNaiveForecaster(season_length=7)
         tags = forecaster.__sklearn_tags__()
-        assert tags.forecaster_tags.ignores_exogenous is True
+        assert tags.forecaster_tags.requires_exogenous is False
 
     def test_croston_ignores_exogenous(self):
         """Croston should ignore exogenous features."""
         forecaster = CrostonForecaster()
         tags = forecaster.__sklearn_tags__()
-        assert tags.forecaster_tags.ignores_exogenous is True
+        assert tags.forecaster_tags.requires_exogenous is False
 
     def test_arima_supports_exogenous(self):
         """ARIMA models should support exogenous features."""
         forecaster = ARIMAForecaster(order=(1, 0, 0))
         tags = forecaster.__sklearn_tags__()
-        assert tags.forecaster_tags.ignores_exogenous is False
+        assert tags.forecaster_tags.requires_exogenous is True
 
     def test_auto_arima_supports_exogenous(self):
         """AutoARIMA should support exogenous features."""
         forecaster = AutoARIMAForecaster()
         tags = forecaster.__sklearn_tags__()
-        assert tags.forecaster_tags.ignores_exogenous is False
+        assert tags.forecaster_tags.requires_exogenous is True
 
     def test_holt_winters_ignores_exogenous(self):
         """HoltWinters should ignore exogenous features (default tag)."""
         forecaster = HoltWintersForecaster(season_length=7)
         tags = forecaster.__sklearn_tags__()
-        assert tags.forecaster_tags.ignores_exogenous is True
+        assert tags.forecaster_tags.requires_exogenous is False
 
     def test_theta_ignores_exogenous(self):
         """Theta should ignore exogenous features (default tag)."""
         forecaster = ThetaForecaster()
         tags = forecaster.__sklearn_tags__()
-        assert tags.forecaster_tags.ignores_exogenous is True
+        assert tags.forecaster_tags.requires_exogenous is False
 
 
 class TestFitValidation:
@@ -847,6 +847,21 @@ class TestFitValidation:
         y_pred = forecaster._convert_nixtla_to_yohou(forecast_df, reset_index=False)
         assert isinstance(y_pred, pl.DataFrame)
         assert "time" in y_pred.columns
+
+    def test_x_forecast_rejected_on_fit(self, fast_forecaster_cls, daily_y_X_factory):
+        """Passing X_forecast to fit should raise ValueError."""
+        y, X = daily_y_X_factory(length=60, n_features=1)
+        forecaster = _make_forecaster(fast_forecaster_cls)
+        with pytest.raises(ValueError, match="Nixtla backends do not support X_forecast"):
+            forecaster.fit(y, X_forecast=X)
+
+    def test_x_forecast_rejected_on_predict(self, fast_forecaster_cls, daily_y_X_factory):
+        """Passing X_forecast to predict should raise ValueError."""
+        y, X = daily_y_X_factory(length=60, n_features=1)
+        forecaster = _make_forecaster(fast_forecaster_cls)
+        forecaster.fit(y, forecasting_horizon=3)
+        with pytest.raises(ValueError, match="Nixtla backends do not support X_forecast"):
+            forecaster.predict(X_forecast=X)
 
 
 class TestSystematicChecks:

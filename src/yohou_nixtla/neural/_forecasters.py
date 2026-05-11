@@ -120,6 +120,8 @@ class NHITSForecaster(BaseNeuralForecaster):
 
     _estimator_default_class = NHITS
 
+    _tags = {"supports_exogenous": True}
+
 
 class MLPForecaster(BaseNeuralForecaster):
     """MLP (Multi-Layer Perceptron) forecaster via neuralforecast.
@@ -166,6 +168,8 @@ class MLPForecaster(BaseNeuralForecaster):
     """
 
     _estimator_default_class = MLP
+
+    _tags = {"supports_exogenous": True}
 
 
 class PatchTSTForecaster(BaseNeuralForecaster):
@@ -221,7 +225,7 @@ class PatchTSTForecaster(BaseNeuralForecaster):
 
     _estimator_default_class = PatchTST
 
-    _tags = {"ignores_exogenous": False}
+    _tags = {"requires_exogenous": True, "supports_exogenous": True}
 
 
 class TimesNetForecaster(BaseNeuralForecaster):
@@ -277,4 +281,4 @@ class TimesNetForecaster(BaseNeuralForecaster):
 
     _estimator_default_class = TimesNet
 
-    _tags = {"ignores_exogenous": False}
+    _tags = {"requires_exogenous": True, "supports_exogenous": True}

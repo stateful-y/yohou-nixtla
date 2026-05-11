@@ -133,8 +133,10 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
     def fit(
         self,
         y: pl.DataFrame,
-        X: pl.DataFrame | None = None,
+        X_actual: pl.DataFrame | None = None,
         forecasting_horizon: int = 1,
+        X_future: pl.DataFrame | None = None,
+        X_forecast: pl.DataFrame | None = None,
         **params,
     ) -> BaseNeuralForecaster:
         """Fit the neural forecaster to the training data.
@@ -147,10 +149,14 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
         ----------
         y : pl.DataFrame
             Target time series with ``time`` column.
-        X : pl.DataFrame or None, default=None
-            Exogenous features with ``time`` column.
+        X_actual : pl.DataFrame or None, default=None
+            Actual observation features with ``time`` column.
         forecasting_horizon : int, default=1
             Number of steps to forecast.
+        X_future : pl.DataFrame or None, default=None
+            Known future features with ``time`` column.
+        X_forecast : pl.DataFrame or None, default=None
+            Not supported. Raises ``ValueError`` if provided.
         **params : dict
             Additional metadata routing parameters.
 
@@ -162,20 +168,56 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
         Raises
         ------
         ValueError
-            If ``forecasting_horizon < 1``.
+            If ``forecasting_horizon < 1`` or ``X_forecast`` is provided.
 
         """
         if forecasting_horizon < 1:
             raise ValueError(f"forecasting_horizon must be a positive integer, got {forecasting_horizon}.")
+
+        if X_future is not None and not self._get_tag("supports_exogenous"):
+            raise ValueError(
+                f"{type(self).__name__} does not support exogenous features "
+                f"(X_future). Use a model that supports exogenous features, "
+                f"such as AutoARIMAForecaster or NHITSForecaster."
+            )
 
         # Inject h, input_size, and max_steps into model params before
         # instantiation. neuralforecast models require h at construction.
         self.params["h"] = forecasting_horizon
         self.params["input_size"] = self.input_size
         self.params["max_steps"] = self.max_steps
+
+        # Inject futr_exog_list if X_future is provided, so the model
+        # knows which columns are future exogenous at construction time.
+        if X_future is not None:
+            futr_cols = [c for c in X_future.columns if c != "time"]
+            from yohou.utils.panel import inspect_panel
+
+            _, panel_groups = inspect_panel(X_future)
+            if panel_groups:
+                # Deduplicate: extract unique variable names from panel columns
+                seen: set[str] = set()
+                futr_exog_names: list[str] = []
+                for c in futr_cols:
+                    parts = c.split("__", 1)
+                    var_name = parts[1] if len(parts) == 2 else c
+                    if var_name not in seen:
+                        seen.add(var_name)
+                        futr_exog_names.append(var_name)
+                self.params["futr_exog_list"] = futr_exog_names
+            else:
+                self.params["futr_exog_list"] = futr_cols
+
         self.instantiate()
 
-        return super().fit(y=y, X=X, forecasting_horizon=forecasting_horizon, **params)
+        return super().fit(
+            y=y,
+            X_actual=X_actual,
+            forecasting_horizon=forecasting_horizon,
+            X_future=X_future,
+            X_forecast=X_forecast,
+            **params,
+        )
 
     def _fit_backend(self, nixtla_df: Any, forecasting_horizon: int) -> None:
         """Create and fit the NeuralForecast orchestrator.
@@ -197,7 +239,7 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
         nf.fit(df=nixtla_df)
         self.nixtla_forecaster_ = nf
 
-    def _predict_backend(self, forecasting_horizon: int, X: pl.DataFrame | None = None) -> Any:
+    def _predict_backend(self, forecasting_horizon: int, X_future: Any = None) -> Any:
         """Generate raw predictions from the NeuralForecast orchestrator.
 
         Neural models always predict exactly ``h`` steps (the horizon set
@@ -208,8 +250,9 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
         ----------
         forecasting_horizon : int
             Number of steps to forecast.
-        X : pl.DataFrame or None, default=None
-            Future exogenous features (unused currently).
+        X_future : pd.DataFrame or None, default=None
+            Known future features in Nixtla long format, passed as
+            ``futr_df`` to ``NeuralForecast.predict()``.
 
         Returns
         -------
@@ -218,11 +261,12 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
 
         """
         check_is_fitted(self, ["nixtla_forecaster_"])
-        return self.nixtla_forecaster_.predict()
+        return self.nixtla_forecaster_.predict(futr_df=X_future)
 
     def predict(
         self,
-        X: pl.DataFrame | None = None,
+        X_future: pl.DataFrame | None = None,
+        X_forecast: pl.DataFrame | None = None,
         forecasting_horizon: int | None = None,
         groups: list[str] | None = None,
         predict_transformed: bool = False,
@@ -236,8 +280,10 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
 
         Parameters
         ----------
-        X : pl.DataFrame or None, default=None
-            Future exogenous features.
+        X_future : pl.DataFrame or None, default=None
+            Known future features.
+        X_forecast : pl.DataFrame or None, default=None
+            Not supported. Raises ``ValueError`` if provided.
         forecasting_horizon : int or None, default=None
             Number of steps to forecast. If None, uses the horizon from fit.
         groups : list of str or None, default=None
@@ -256,7 +302,8 @@ class BaseNeuralForecaster(BaseNixtlaForecaster):
         check_is_fitted(self, ["nixtla_forecaster_"])
 
         y_pred = super().predict(
-            X=X,
+            X_future=X_future,
+            X_forecast=X_forecast,
             forecasting_horizon=self.fit_forecasting_horizon_,
             groups=groups,
             predict_transformed=predict_transformed,

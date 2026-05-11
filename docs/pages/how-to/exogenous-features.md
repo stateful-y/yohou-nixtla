@@ -1,7 +1,13 @@
 # How to Use Exogenous Features
 
 This guide shows you how to incorporate external variables (exogenous features)
-into your forecasts.
+into your forecasts. Yohou-Nixtla supports two exogenous inputs:
+
+- **`X_actual`**: observation features available at training time. These go
+  through yohou's feature transformation pipeline (lags, rolling statistics)
+  before reaching the Nixtla backend.
+- **`X_future`**: known future features passed directly to the Nixtla backend
+  at both fit and predict time, bypassing yohou's feature engineering.
 
 ## Prerequisites
 
@@ -10,93 +16,164 @@ into your forecasts.
 
 ## Supported forecasters
 
-Only these forecasters accept exogenous features:
+Only certain forecasters accept exogenous features. Passing `X_future` to an
+unsupported forecaster raises a `ValueError`.
 
-| Backend | Forecaster |
-|---------|-----------|
-| Stats | `AutoARIMAForecaster`, `ARIMAForecaster` |
-| Neural | `PatchTSTForecaster`, `TimesNetForecaster` |
+| Backend | Forecaster | Exogenous support |
+|---------|-----------|-------------------|
+| Stats | `AutoARIMAForecaster` | Required |
+| Stats | `ARIMAForecaster` | Required |
+| Stats | `HoltWintersForecaster` | Optional |
+| Neural | `NHITSForecaster` | Optional |
+| Neural | `MLPForecaster` | Optional |
+| Neural | `PatchTSTForecaster` | Required |
+| Neural | `TimesNetForecaster` | Required |
 
-Other forecasters (e.g., `AutoETSForecaster`, `NBEATSForecaster`) ignore
-exogenous data. If you pass `X` to a forecaster that does not support it,
-it will be silently ignored during preprocessing.
+Models marked "Required" always expect exogenous features at both fit and
+predict time. Models marked "Optional" work with or without them.
 
-## Prepare your feature DataFrames
+## Use `X_actual` for observation features
 
-Create a polars DataFrame with a `time` column and one column per feature.
-`X_train` must have the same number of rows as `y_train`:
+`X_actual` provides historical observation features (values known only up to
+the present). These flow through yohou's `feature_transformer` pipeline, so
+lags, rolling statistics, and other engineered features are computed
+automatically.
+
+Create a polars DataFrame with a `time` column matching `y`:
 
 ```python
 import polars as pl
 
-X_train = pl.DataFrame({
+X_actual = pl.DataFrame({
+    "time": y_train["time"],
+    "temperature": [...],
+    "humidity": [...],
+})
+```
+
+Pass it to `fit`:
+
+```python
+from yohou_nixtla import AutoARIMAForecaster
+
+forecaster = AutoARIMAForecaster(season_length=12)
+forecaster.fit(y_train, X_actual=X_actual, forecasting_horizon=12)
+y_pred = forecaster.predict()
+```
+
+`X_actual` does not require a `supports_exogenous` tag on the forecaster,
+since it is processed by yohou's general feature pipeline.
+
+## Use `X_future` for known future features
+
+`X_future` provides features whose values are known in advance for the
+forecast horizon (for example, planned promotions, holidays, or scheduled
+prices). These bypass yohou's feature engineering and are passed directly
+to the Nixtla backend.
+
+### Prepare your feature DataFrames
+
+Create a polars DataFrame with a `time` column and one column per feature.
+The training DataFrame must cover the same time range as `y`:
+
+```python
+import polars as pl
+
+X_future_train = pl.DataFrame({
     "time": y_train["time"],
     "price": [...],
     "promotion": [...],
 })
 ```
 
-## Fit with exogenous features
+For prediction, create a DataFrame covering the forecast horizon:
 
-Pass `X` to `fit`. The features are merged into the Nixtla long-format
-training data automatically:
+```python
+X_future_predict = pl.DataFrame({
+    "time": future_dates,
+    "price": [...],
+    "promotion": [...],
+})
+```
+
+The predict DataFrame must contain the same feature columns as the training
+DataFrame.
+
+### Fit and predict with `X_future`
+
+Pass `X_future` to both `fit` and `predict`:
 
 ```python
 from yohou_nixtla import AutoARIMAForecaster
 
 forecaster = AutoARIMAForecaster(season_length=12)
-forecaster.fit(y_train, X=X_train, forecasting_horizon=12)
+forecaster.fit(y_train, X_future=X_future_train, forecasting_horizon=12)
+y_pred = forecaster.predict(X_future=X_future_predict)
 ```
 
-## Predict
+The features are merged into the Nixtla long-format DataFrame automatically.
+At predict time, the conversion layer validates that `X_future` contains the
+same columns that were present during training.
 
-Call `predict` with the desired horizon:
+### Panel data with `X_future`
 
-```python
-y_pred = forecaster.predict(forecasting_horizon=12)
-```
-
-## Apply feature preprocessing
-
-If your features have different scales, set a `feature_transformer` to
-normalize them before they reach the backend. The transformer is fit on
-`X_train` during `fit` and applied consistently at prediction time:
-
-```python
-from sklearn.preprocessing import StandardScaler
-from yohou_nixtla import PatchTSTForecaster
-
-forecaster = PatchTSTForecaster(
-    input_size=24,
-    max_steps=500,
-    feature_transformer=StandardScaler(),
-)
-forecaster.fit(y_train, X=X_train, forecasting_horizon=12)
-y_pred = forecaster.predict(forecasting_horizon=12)
-```
-
-## Panel data with exogenous features
-
-For panel (grouped) data, feature columns can be global or per-group. The
+For panel (grouped) data, feature columns can be per-group or global. The
 conversion module matches them automatically:
 
 ```python
 # Per-group features share the group suffix
-X_train = pl.DataFrame({
+X_future_train = pl.DataFrame({
     "time": y_train["time"],
     "price__store_1": [...],
     "price__store_2": [...],
 })
 
 # Global features (no __) are broadcast to all groups
-X_train = pl.DataFrame({
+X_future_train = pl.DataFrame({
     "time": y_train["time"],
     "oil_price": [...],
 })
 ```
 
+### Neural forecasters
+
+Neural forecasters (NHITS, MLP, PatchTST, TimesNet) receive the exogenous
+columns through neuralforecast's `futr_exog_list` parameter. This parameter is
+injected automatically during `fit` based on the columns in `X_future`:
+
+```python
+from yohou_nixtla.neural import NHITSForecaster
+
+forecaster = NHITSForecaster(input_size=24, max_steps=500)
+forecaster.fit(y_train, X_future=X_future_train, forecasting_horizon=12)
+y_pred = forecaster.predict(X_future=X_future_predict)
+```
+
+## Combine `X_actual` and `X_future`
+
+You can use both inputs together. `X_actual` feeds observation features into
+yohou's feature pipeline, while `X_future` passes known future values directly
+to the Nixtla backend:
+
+```python
+forecaster = AutoARIMAForecaster(season_length=12)
+forecaster.fit(
+    y_train,
+    X_actual=X_actual,
+    X_future=X_future_train,
+    forecasting_horizon=12,
+)
+y_pred = forecaster.predict(X_future=X_future_predict)
+```
+
+## Unsupported: `X_forecast`
+
+Nixtla backends do not support yohou's `X_forecast` parameter (vintage-time
+exogenous features). Passing `X_forecast` to any Nixtla forecaster raises a
+`ValueError`.
+
 ## See Also
 
-- [Concepts](../explanation/concepts.md): exogenous feature design
+- [Concepts](../explanation/concepts.md): exogenous feature integration design
 - [How to Choose a Forecaster](choose-forecaster.md): which forecasters support exogenous features
 - [API Reference](../reference/api.md): `fit` and `predict` method signatures
