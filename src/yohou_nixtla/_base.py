@@ -24,7 +24,7 @@ from sklearn.utils.validation import check_is_fitted
 from sklearn_wrap.base import BaseClassWrapper
 from yohou.point import BasePointForecaster
 from yohou.utils import cast
-from yohou.utils.panel import dict_to_panel, inspect_panel, select_panel_columns
+from yohou.utils.panel import dict_to_panel, inspect_panel
 from yohou.utils.validate_data import validate_forecaster_data
 from yohou.utils.validation import check_groups
 
@@ -458,8 +458,21 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         y_pred_no_time = y_pred.drop("time")
         result = self._add_time_columns(y_pred_no_time)
 
-        # Filter to requested panel groups (keeps time columns as globals)
-        return select_panel_columns(result, groups, include_global=True)
+        # Non-panel forecasters have no groups to filter; return as-is.
+        if groups is None:
+            return result
+
+        # Filter to the requested panel groups. Keep the index columns
+        # ("time" and, when present, "vintage_time") and columns belonging to a
+        # requested group ("<group>__..."); drop columns of any non-requested
+        # group so predict(groups=[...]) returns only those groups.
+        index_cols = [c for c in ("vintage_time", "time") if c in result.columns]
+        keep = index_cols + [
+            c
+            for c in result.columns
+            if c not in index_cols and (any(c.startswith(f"{g}__") for g in groups) or "__" not in c)
+        ]
+        return result.select(keep)
 
     @abc.abstractmethod
     def _predict_backend(self, forecasting_horizon: int, X_future: Any = None) -> Any:

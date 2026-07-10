@@ -633,7 +633,13 @@ class TestFitValidation:
 class TestSystematicChecks:
     """Run yohou's systematic forecaster checks on neural wrappers."""
 
-    EXPECTED_FAILURES = frozenset()
+    # Neural models forward a ``loss`` to neuralforecast (default ``MAE()``), a
+    # torch module whose ``__eq__`` is identity-based. yohou's
+    # ``check_clone_preserves_forecaster_params`` compares params for equality, so
+    # a cloned loss (a fresh, equivalent instance) is reported as changed. yohou
+    # relaxes this check for identity-``__eq__`` objects (stateful-y/yohou#94);
+    # remove this expected failure once the pinned yohou includes that fix.
+    EXPECTED_FAILURES = frozenset({"check_clone_preserves_forecaster_params"})
 
     @pytest.mark.slow
     @pytest.mark.parametrize(
