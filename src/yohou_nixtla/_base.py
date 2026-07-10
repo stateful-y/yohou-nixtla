@@ -60,9 +60,9 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
 
     Parameters
     ----------
-    feature_transformer : BaseTransformer or None, default=None
+    feature_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
-    target_transformer : BaseTransformer or None, default=None
+    target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
         after predicting to return forecasts in the original scale.
     target_as_feature : {"transformed", "raw"} or None, default=None
