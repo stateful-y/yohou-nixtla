@@ -172,8 +172,10 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "example: marks tests for example notebooks (deselect with '-m \"not example\"')",
 ]
+# ``pandas.errors.Pandas4Warning`` is deliberately absent here: it only exists
+# on pandas >= 3.0 and pytest aborts when a filter names a class it cannot
+# import. It is registered conditionally in the root ``conftest.py`` instead.
 filterwarnings = [
-    "ignore::pandas.errors.Pandas4Warning",
     "ignore:The copy keyword is deprecated:FutureWarning",
     "ignore:.*val_check_steps is greater than max_steps.*:UserWarning",
     "ignore:.*does not have many workers.*:UserWarning",
