@@ -12,6 +12,8 @@ Yohou uses the `__` separator in column names to signal panel (grouped) data
 (e.g., `sales__store_1`). All Yohou-Nixtla forecasters detect this convention
 automatically. See [Concepts](../explanation/concepts.md#panel-data-and-the-__-convention) for details.
 
+<!-- COMPANION_NOTEBOOKS -->
+
 ## Structure your DataFrame
 
 Create a wide-format polars DataFrame with `time` and one column per group.
@@ -118,7 +120,7 @@ Only forecasters that accept exogenous features can use this (see
 
 !!! tip "Interactive version available"
 
-    The [Forecasting Panel Data](../tutorials/examples.md) notebook lets you
+    The [Forecasting Panel Data](../examples/index.md) notebook lets you
     experiment with panel data forecasting interactively.
 
 ## See Also

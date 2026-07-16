@@ -7,6 +7,8 @@ data and use case.
 
 - Yohou-Nixtla installed ([Getting Started](../tutorials/getting-started.md))
 
+<!-- COMPANION_NOTEBOOKS -->
+
 ## Establish a baseline first
 
 Before comparing models, fit a `SeasonalNaiveForecaster` so you have a
@@ -147,7 +149,7 @@ See [How to Use Exogenous Features](exogenous-features.md) for details.
 
 !!! tip "Interactive version available"
 
-    The [Comparing Forecasters](../tutorials/examples.md) notebook lets you run
+    The [Comparing Forecasters](../examples/index.md) notebook lets you run
     side-by-side forecaster comparisons interactively.
 
 ## See Also
