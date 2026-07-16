@@ -1,3 +1,7 @@
+---
+description: Set up a development environment, follow the coding standards, and get a pull request merged.
+---
+
 # Contributing to Yohou-Nixtla
 
 Thank you for your interest in contributing to Yohou-Nixtla! This document provides guidelines for contributing to the project.

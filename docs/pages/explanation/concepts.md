@@ -1,3 +1,7 @@
+---
+description: How Yohou-Nixtla bridges Yohou and Nixtla — the two backends, the wrapping model, and the panel data convention.
+---
+
 # About Yohou-Nixtla
 
 Yohou-Nixtla bridges the [Yohou](https://github.com/stateful-y/yohou) time series forecasting framework and the [Nixtla](https://nixtla.io/) ecosystem. It wraps Nixtla's forecasting libraries (**StatsForecast** and **NeuralForecast**) as Yohou-compatible forecasters, so you get Nixtla's state-of-the-art models with Yohou's scikit-learn-compatible API.
