@@ -10,7 +10,7 @@ Yohou-Nixtla's panel data convention.
 
 Yohou uses the `__` separator in column names to signal panel (grouped) data
 (e.g., `sales__store_1`). All Yohou-Nixtla forecasters detect this convention
-automatically. See [Concepts](../explanation/concepts.md#panel-data) for details.
+automatically. See [Concepts](../explanation/concepts.md#panel-data-and-the-__-convention) for details.
 
 ## Structure your DataFrame
 
