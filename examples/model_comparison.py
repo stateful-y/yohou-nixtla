@@ -12,18 +12,20 @@
 import marimo
 
 __generated_with = "0.13.0"
+# Module level, not inside a cell: docs/hooks.py reads this with
+# ast.iter_child_nodes, which only sees top-level assignments.
+__gallery__ = {
+    "title": "How to Compare Forecasters",
+    "description": "Fit multiple statistical forecasters on the same dataset and evaluate their accuracy with MAE.",
+    "category": "how-to",
+    "companion": "pages/how-to/choose-forecaster.md",
+}
 app = marimo.App(width="medium")
 
 
 @app.cell(hide_code=True)
 def _():
     import marimo as mo
-
-    __gallery__ = {
-        "title": "How to Compare Forecasters",
-        "description": "Fit multiple statistical forecasters on the same dataset and evaluate their accuracy with MAE.",
-        "category": "how-to",
-    }
 
     return (mo,)
 

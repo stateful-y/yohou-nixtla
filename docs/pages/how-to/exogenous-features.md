@@ -1,3 +1,7 @@
+---
+description: Feed external variables into a forecast with X_actual, X_future, and X_forecast.
+---
+
 # How to Use Exogenous Features
 
 This guide shows you how to incorporate external variables (exogenous features)

@@ -1,3 +1,7 @@
+---
+description: Runnable marimo notebooks you can open in the browser or run locally.
+---
+
 # Examples
 
 Interactive notebooks grouped by purpose: **Tutorials** walk through a topic step-by-step, while **How-to Guides** solve a specific task.
