@@ -71,6 +71,7 @@ forecaster = CrostonForecaster()
 | `ARIMAForecaster` | You know the exact `(p, d, q)` order; supports exogenous features |
 | `HoltWintersForecaster` | You want explicit control over error, trend, and seasonality types |
 | `ThetaForecaster` | Simple, fast decomposition; good for short seasonal series |
+| `NaiveForecaster` | Baseline for non-seasonal series; repeats the last observed value |
 
 ## Switch to Neural when Stats fall short
 
