@@ -82,7 +82,7 @@ Every Yohou-Nixtla forecaster inherits from two parent classes:
   constructor.
 - **`BasePointForecaster`** (from Yohou): provides the
   `fit`/`predict`/`observe`/`rewind` lifecycle, panel data detection, and
-  target/feature transformer management.
+  target/actual transformer management.
 
 This dual inheritance means forecasters work natively with both Yohou pipelines
 (like `DecompositionPipeline` or `ColumnForecaster`) and scikit-learn
