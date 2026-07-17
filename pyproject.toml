@@ -20,7 +20,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "yohou>=0.1.0a6",
+    "yohou>=0.2.0",
     "sklearn-wrap>=0.1.0a1",
     "polars>=0.20",
     "numpy>=2.0.0",

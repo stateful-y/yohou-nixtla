@@ -24,7 +24,7 @@ class NBEATSForecaster(BaseNeuralForecaster):
         Lookback window size.
     max_steps : int, default=100
         Maximum training steps.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -78,7 +78,7 @@ class NHITSForecaster(BaseNeuralForecaster):
         Lookback window size.
     max_steps : int, default=100
         Maximum training steps.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -134,7 +134,7 @@ class MLPForecaster(BaseNeuralForecaster):
         Lookback window size.
     max_steps : int, default=100
         Maximum training steps.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -183,7 +183,7 @@ class PatchTSTForecaster(BaseNeuralForecaster):
         Lookback window size.
     max_steps : int, default=100
         Maximum training steps.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -239,7 +239,7 @@ class TimesNetForecaster(BaseNeuralForecaster):
         Lookback window size.
     max_steps : int, default=100
         Maximum training steps.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed

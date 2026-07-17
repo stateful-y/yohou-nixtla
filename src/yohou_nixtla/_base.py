@@ -4,7 +4,7 @@ This module provides ``BaseNixtlaForecaster``, the single shared base class
 for all Nixtla backend integrations (statsforecast, neuralforecast).
 
 Nixtla forecasters are **pure algorithm wrappers** -- yohou handles feature
-transformation (``feature_transformer``, ``target_as_feature``,
+transformation (``actual_transformer``, ``target_as_feature``,
 ``target_transformer``), panel data (per-group transforms via
 ``BasePanelForecaster``), and exogenous features (through yohou's pipeline).
 The Nixtla backend receives already-transformed data in long format for
@@ -60,7 +60,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
 
     Parameters
     ----------
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -103,7 +103,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
     def __init__(
         self,
         *,
-        feature_transformer=None,
+        actual_transformer=None,
         target_transformer=None,
         target_as_feature=None,
         freq: str | None = None,
@@ -112,7 +112,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         BaseClassWrapper.__init__(self, **params)
         BasePointForecaster.__init__(
             self,
-            feature_transformer=feature_transformer,
+            actual_transformer=actual_transformer,
             target_transformer=target_transformer,
             target_as_feature=target_as_feature,
         )
@@ -137,7 +137,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         """
         params = super().get_params(deep=deep)
         params["freq"] = self.freq
-        params["feature_transformer"] = self.feature_transformer
+        params["actual_transformer"] = self.actual_transformer
         params["target_transformer"] = self.target_transformer
         params["target_as_feature"] = self.target_as_feature
         return params
@@ -158,7 +158,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         self
 
         """
-        for name in ("freq", "feature_transformer", "target_transformer", "target_as_feature"):
+        for name in ("freq", "actual_transformer", "target_transformer", "target_as_feature"):
             if name in params:
                 setattr(self, name, params.pop(name))
         super().set_params(**params)

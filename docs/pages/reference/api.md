@@ -55,7 +55,7 @@ All forecasters inherit these parameters from `BaseNixtlaForecaster`:
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `freq` | `str \| None` | `None` | Frequency string. Auto-inferred from data if `None`. |
-| `feature_transformer` | transformer or `None` | `None` | Applied to exogenous features before fitting and predicting. |
+| `actual_transformer` | transformer or `None` | `None` | Applied to exogenous features before fitting and predicting. |
 | `target_transformer` | transformer or `None` | `None` | Applied to target before fitting; inverse-applied after predicting. |
 | `target_as_feature` | `"transformed" \| "raw" \| None` | `None` | Include lagged target values as additional features. |
 
