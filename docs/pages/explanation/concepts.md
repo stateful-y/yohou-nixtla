@@ -1,5 +1,5 @@
 ---
-description: How Yohou-Nixtla bridges Yohou and Nixtla — the two backends, the wrapping model, and the panel data convention.
+description: How Yohou-Nixtla bridges Yohou and Nixtla, covering the two backends, the wrapping model, and the panel data convention.
 ---
 
 # About Yohou-Nixtla
