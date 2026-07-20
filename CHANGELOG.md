@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.1.0-alpha.5] - 2026-07-20
+
+This **minor release** includes 5 commits.
+
+
+### Documentation
+- Rename BaseTransformer to BaseActualTransformer in docstrings  ([#26](https://github.com/stateful-y/yohou-nixtla/pull/26)) by @gtauzin
+
+### Testing
+- Register Pandas4Warning filter only when pandas 3 is installed  ([#27](https://github.com/stateful-y/yohou-nixtla/pull/27)) by @gtauzin
+
+### Miscellaneous Tasks
+- Update from template v0.26.1 and restore yohou[nixtla] logos  ([#28](https://github.com/stateful-y/yohou-nixtla/pull/28)) by @gtauzin
+- Update from template v0.27.0  ([#32](https://github.com/stateful-y/yohou-nixtla/pull/32)) by @gtauzin
+- Follow yohou rename of feature_transformer to actual_transformer  ([#31](https://github.com/stateful-y/yohou-nixtla/pull/31)) by @gtauzin
+
+### Contributors
+
+Thanks to all contributors for this release:
+- @gtauzin
+
 ## [0.1.0-alpha.4] - 2026-05-11
 
 This **minor release** includes 2 commits.
