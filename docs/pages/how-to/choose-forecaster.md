@@ -7,6 +7,8 @@ data and use case.
 
 - Yohou-Nixtla installed ([Getting Started](../tutorials/getting-started.md))
 
+<!-- COMPANION_NOTEBOOKS -->
+
 ## Establish a baseline first
 
 Before comparing models, fit a `SeasonalNaiveForecaster` so you have a
@@ -69,6 +71,7 @@ forecaster = CrostonForecaster()
 | `ARIMAForecaster` | You know the exact `(p, d, q)` order; supports exogenous features |
 | `HoltWintersForecaster` | You want explicit control over error, trend, and seasonality types |
 | `ThetaForecaster` | Simple, fast decomposition; good for short seasonal series |
+| `NaiveForecaster` | Baseline for non-seasonal series; repeats the last observed value |
 
 ## Switch to Neural when Stats fall short
 
@@ -147,7 +150,7 @@ See [How to Use Exogenous Features](exogenous-features.md) for details.
 
 !!! tip "Interactive version available"
 
-    The [Comparing Forecasters](../tutorials/examples.md) notebook lets you run
+    The [Comparing Forecasters](../examples/index.md) notebook lets you run
     side-by-side forecaster comparisons interactively.
 
 ## See Also

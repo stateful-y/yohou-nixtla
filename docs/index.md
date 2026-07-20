@@ -39,7 +39,7 @@ Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast*
 
     Compare statistical and neural forecasters on real data
 
-    [Examples](pages/tutorials/examples.md)
+    [Examples](pages/examples/index.md)
 
 </div>
 

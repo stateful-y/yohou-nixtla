@@ -112,7 +112,7 @@ pattern works for all 15 forecasters in the package.
 
 ## Next steps
 
-- [Examples](examples.md): compare statistical and neural forecasters
+- [Examples](../examples/index.md): compare statistical and neural forecasters
   interactively
 - [How to Choose a Forecaster](../how-to/choose-forecaster.md): pick the
   right model for your data

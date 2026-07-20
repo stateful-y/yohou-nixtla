@@ -71,7 +71,16 @@ markdown_extensions:
   - pymdownx.magiclink
   - pymdownx.mark
   - pymdownx.smartsymbols
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      # Ordered: docs-relative includes win, but a page can still reach the
+      # repo root (e.g. CHANGELOG.md).  Do not narrow this to [docs] -- a
+      # project may legitimately include a file from src/ or the repo root.
+      base_path:
+        - docs
+        - .
+      # Without this a missing include is dropped silently, rendering a page
+      # that looks deliberate and is empty.
+      check_paths: true
   - pymdownx.superfences:
       custom_fences:
         - class: mermaid
@@ -125,6 +134,11 @@ plugins:
       handlers:
         python:
           paths: [src]
+          inventories:
+            # Resolves standard-library types in signatures and See Also
+            # entries.  Add your dependencies' inventories here too, e.g.
+            #   - https://numpy.org/doc/stable/objects.inv
+            - https://docs.python.org/3/objects.inv
           options:
             docstring_style: numpy
             docstring_options:
@@ -141,19 +155,30 @@ plugins:
 nav:
   - Home: index.md
   - Tutorials:
+    - pages/tutorials/index.md
     - Getting Started: pages/tutorials/getting-started.md
-    - Examples: pages/tutorials/examples.md
   - How-to Guides:
+    - pages/how-to/index.md
     - Choose the Right Forecaster: pages/how-to/choose-forecaster.md
     - Work with Panel Data: pages/how-to/panel-data.md
     - Use Exogenous Features: pages/how-to/exogenous-features.md
     - Integrate with Yohou: pages/how-to/integrate-yohou.md
     - Troubleshooting: pages/how-to/troubleshooting.md
     - Contributing: pages/how-to/contribute.md
-  - Reference:
-    - API Reference: pages/reference/api.md
+  - Examples:
+    - pages/examples/index.md
   - Explanation:
+    - pages/explanation/index.md
     - Concepts: pages/explanation/concepts.md
+  # Reference is last on purpose: it is the section you arrive at knowing what
+  # you want, so it earns its place by being findable, not by being passed
+  # through. Everything above it is read in roughly the order a newcomer needs
+  # it -- learn, do, see, understand -- and reference is where you stop reading
+  # and start looking things up.
+  - Reference:
+    - pages/reference/index.md
+    - API Reference: pages/reference/api.md
+    - Changelog: pages/reference/changelog.md
 
 extra:
   social:
@@ -163,4 +188,7 @@ extra:
 watch:
   - mkdocs.yml
   - docs
+  # The API pages are generated from the package source, so a source edit must
+  # trigger a rebuild -- otherwise adding a class shows nothing until restart.
+  - src
   - examples
