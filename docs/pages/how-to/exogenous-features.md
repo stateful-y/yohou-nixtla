@@ -39,7 +39,7 @@ predict time. Models marked "Optional" work with or without them.
 ## Use `X_actual` for observation features
 
 `X_actual` provides historical observation features (values known only up to
-the present). These flow through yohou's `feature_transformer` pipeline, so
+the present). These flow through yohou's `actual_transformer` pipeline, so
 lags, rolling statistics, and other engineered features are computed
 automatically.
 

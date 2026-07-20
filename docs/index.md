@@ -58,7 +58,7 @@ Yohou-Nixtla fits each group independently in a single call.
 long-format transparently on every `fit` and `predict` call.
 
 - **Exogenous features**: Pass external regressors through `X` with optional
-`feature_transformer` for automatic scaling and preprocessing.
+`actual_transformer` for automatic scaling and preprocessing.
 
 - **Minimal boilerplate**: Adding a new Nixtla model is a three-line class. No glue code,
 no manual DataFrame wrangling.
