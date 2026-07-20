@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pathlib
 from collections.abc import Generator
 from datetime import datetime, timedelta
 from typing import Any
@@ -9,6 +10,24 @@ from typing import Any
 import numpy as np
 import polars as pl
 import pytest
+
+
+@pytest.fixture(autouse=True)
+def _isolated_cwd(tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Give every test its own working directory.
+
+    neuralforecast delegates training to a ``pytorch_lightning.Trainer`` whose
+    ``default_root_dir`` defaults to the process working directory, so each
+    ``fit`` writes a ``lightning_logs/version_N`` directory there. Lightning
+    chooses ``N`` by listing that directory and taking ``max + 1``, then creates
+    it through ``SummaryWriter`` with ``exist_ok=False``. That read-then-create
+    is not atomic: under ``pytest -n auto`` two workers can settle on the same
+    ``N`` before either creates it, and the loser dies with ``FileExistsError``.
+
+    Isolating the working directory removes the shared directory the workers
+    were racing on, and keeps training artefacts out of the repository root.
+    """
+    monkeypatch.chdir(tmp_path)
 
 
 def run_checks(

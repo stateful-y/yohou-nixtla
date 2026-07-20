@@ -8,8 +8,6 @@ Covers ``BaseNeuralForecaster`` and concrete wrapper classes:
 
 from __future__ import annotations
 
-import tempfile
-
 import polars as pl
 import pytest
 from sklearn.base import clone
@@ -326,14 +324,12 @@ class TestFitPredict:
 
 def _make_neural_forecaster(cls, **extra_kwargs):
     """Create a neural forecaster with sensible defaults for fast testing."""
+    # The ``lightning_logs`` directory each fit writes is isolated per test by the
+    # autouse ``_isolated_cwd`` fixture in ``conftest.py``, so no ``default_root_dir``
+    # override is needed here.
     defaults = {
         "input_size": 12,
         "max_steps": 5,
-        # Use a unique temp directory so parallel xdist workers don't race on
-        # the shared ``lightning_logs/version_N`` directory.
-        # neuralforecast forwards unknown kwargs straight to pl.Trainer, so
-        # ``default_root_dir`` is passed at the top level, not nested.
-        "default_root_dir": tempfile.mkdtemp(),
     }
     # Per-model architecture reduction for faster tests.
     _model_defaults = {
