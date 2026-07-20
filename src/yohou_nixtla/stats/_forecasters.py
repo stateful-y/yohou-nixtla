@@ -43,7 +43,7 @@ class AutoARIMAForecaster(BaseStatsForecaster):
         Maximum non-seasonal MA order.
     freq : str or None, default=None
         Frequency string. Auto-inferred from data if None.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -92,7 +92,7 @@ class AutoETSForecaster(BaseStatsForecaster):
         ETS model specification. ``"ZZZ"`` selects automatically.
     freq : str or None, default=None
         Frequency string. Auto-inferred from data if None.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -139,7 +139,7 @@ class AutoCESForecaster(BaseStatsForecaster):
         CES model specification.
     freq : str or None, default=None
         Frequency string. Auto-inferred from data if None.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -185,7 +185,7 @@ class AutoThetaForecaster(BaseStatsForecaster):
         Type of seasonal decomposition.
     freq : str or None, default=None
         Frequency string. Auto-inferred from data if None.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -227,7 +227,7 @@ class NaiveForecaster(BaseStatsForecaster):
     ----------
     freq : str or None, default=None
         Frequency string. Auto-inferred from data if None.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -271,7 +271,7 @@ class SeasonalNaiveForecaster(BaseStatsForecaster):
         Length of the seasonal period.
     freq : str or None, default=None
         Frequency string. Auto-inferred from data if None.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -319,7 +319,7 @@ class ARIMAForecaster(BaseStatsForecaster):
         The ``(P, D, Q)`` seasonal order.
     freq : str or None, default=None
         Frequency string. Auto-inferred from data if None.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -367,7 +367,7 @@ class HoltWintersForecaster(BaseStatsForecaster):
         Error type: ``"A"`` (additive) or ``"M"`` (multiplicative).
     freq : str or None, default=None
         Frequency string. Auto-inferred from data if None.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -416,7 +416,7 @@ class ThetaForecaster(BaseStatsForecaster):
         Type of seasonal decomposition.
     freq : str or None, default=None
         Frequency string. Auto-inferred from data if None.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed
@@ -458,7 +458,7 @@ class CrostonForecaster(BaseStatsForecaster):
     ----------
     freq : str or None, default=None
         Frequency string. Auto-inferred from data if None.
-    feature_transformer : BaseActualTransformer or None, default=None
+    actual_transformer : BaseActualTransformer or None, default=None
         Transformer applied to exogenous features before fitting/predicting.
     target_transformer : BaseActualTransformer or None, default=None
         Transformer applied to the target before fitting. Inverse-transformed

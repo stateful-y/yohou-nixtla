@@ -403,16 +403,16 @@ class TestPanelData:
 
 
 class TestTransformerIntegration:
-    """Tests for feature_transformer / target_transformer / target_as_feature."""
+    """Tests for actual_transformer / target_transformer / target_as_feature."""
 
     def test_get_params_includes_transformer_params(self, fast_neural_cls):
         """get_params should include transformer-related params."""
         forecaster = fast_neural_cls()
         params = forecaster.get_params()
-        assert "feature_transformer" in params
+        assert "actual_transformer" in params
         assert "target_transformer" in params
         assert "target_as_feature" in params
-        assert params["feature_transformer"] is None
+        assert params["actual_transformer"] is None
         assert params["target_transformer"] is None
         assert params["target_as_feature"] is None
 
@@ -422,18 +422,18 @@ class TestTransformerIntegration:
 
         ft = FunctionTransformer()
         forecaster = fast_neural_cls()
-        forecaster.set_params(feature_transformer=ft)
-        assert forecaster.feature_transformer is ft
+        forecaster.set_params(actual_transformer=ft)
+        assert forecaster.actual_transformer is ft
 
     def test_clone_preserves_transformers(self, fast_neural_cls):
         """clone should preserve transformer params."""
         from yohou.preprocessing import FunctionTransformer
 
         ft = FunctionTransformer()
-        forecaster = fast_neural_cls(feature_transformer=ft)
+        forecaster = fast_neural_cls(actual_transformer=ft)
         cloned = clone(forecaster)
-        assert cloned.feature_transformer is not None
-        assert type(cloned.feature_transformer) is type(ft)
+        assert cloned.actual_transformer is not None
+        assert type(cloned.actual_transformer) is type(ft)
 
     @pytest.mark.slow
     def test_fit_predict_with_target_transformer(self, daily_y_X_factory):
@@ -483,7 +483,7 @@ class TestTransformerIntegration:
         forecaster = fast_neural_cls()
         tags = forecaster.__sklearn_tags__()
         assert tags.forecaster_tags.uses_target_transformer is False
-        assert tags.forecaster_tags.uses_feature_transformer is False
+        assert tags.forecaster_tags.uses_actual_transformer is False
 
         ft = FunctionTransformer()
         forecaster_with = fast_neural_cls(target_transformer=ft)
@@ -539,19 +539,19 @@ class TestTransformerIntegration:
         assert len(y_pred) == 3
         assert "time" in y_pred.columns
 
-    def test_feature_transformer_no_X_raises(self, fast_neural_cls, daily_y_X_factory):
-        """feature_transformer with target_as_feature=None and no X should raise."""
+    def test_actual_transformer_no_X_raises(self, fast_neural_cls, daily_y_X_factory):
+        """actual_transformer with target_as_feature=None and no X should raise."""
         from yohou.preprocessing import FunctionTransformer
 
         y, _ = daily_y_X_factory(length=60)
         ft = FunctionTransformer()
-        forecaster = fast_neural_cls(feature_transformer=ft)
+        forecaster = fast_neural_cls(actual_transformer=ft)
         with pytest.raises(ValueError, match="target_as_feature=None requires X"):
             forecaster.fit(y, forecasting_horizon=3)
 
     @pytest.mark.slow
-    def test_target_as_feature_with_feature_transformer(self, daily_y_X_factory):
-        """target_as_feature='transformed' with feature_transformer should work end-to-end."""
+    def test_target_as_feature_with_actual_transformer(self, daily_y_X_factory):
+        """target_as_feature='transformed' with actual_transformer should work end-to-end."""
         from yohou.preprocessing import FunctionTransformer
 
         y, _ = daily_y_X_factory(length=60)
@@ -567,13 +567,13 @@ class TestTransformerIntegration:
         forecaster = _make_neural_forecaster(
             MLPForecaster,
             target_transformer=target_ft,
-            feature_transformer=feature_ft,
+            actual_transformer=feature_ft,
             target_as_feature="transformed",
         )
         forecaster.fit(y, forecasting_horizon=3)
 
         assert forecaster.target_transformer_ is not None
-        assert forecaster.feature_transformer_ is not None
+        assert forecaster.actual_transformer_ is not None
 
         y_pred = forecaster.predict()
         assert len(y_pred) == 3

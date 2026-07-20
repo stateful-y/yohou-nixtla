@@ -27,7 +27,7 @@ This integration enables you to use Nixtla's high-performance forecasters (Stats
 - **Yohou Compatible**: Full `fit/predict`, `get_params/set_params`, `clone` compatibility. Works with GridSearchCV, pipelines, and the Yohou ecosystem.
 - **Polars Native**: All data handling uses polars DataFrames for high-performance time series operations.
 
-> **Note**: Nixtla's MLForecast is not wrapped as Yohou already provides `PointReductionForecaster`, which turns any scikit-learn regressor (Ridge, LightGBM, XGBoost, …) into a recursive multi-step forecaster with full support for feature transformers, target transformers, and panel data.
+> **Note**: Nixtla's MLForecast is not wrapped as Yohou already provides `PointReductionForecaster`, which turns any scikit-learn regressor (Ridge, LightGBM, XGBoost, …) into a recursive multi-step forecaster with full support for actual transformers, target transformers, and panel data.
 
 ## How to install Yohou-Nixtla?
 
