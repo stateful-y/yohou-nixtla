@@ -1,7 +1,7 @@
 ![](assets/logo_dark.png#only-dark){width=800}
 ![](assets/logo_light.png#only-light){width=800}
 
-# Welcome to Yohou-Nixtla's documentation
+# Welcome to Yohou-Nixtla's documentation!
 
 Yohou-Nixtla brings the power of Nixtla's forecasting backends (**StatsForecast** and **NeuralForecast**) into the [Yohou](https://yohou.readthedocs.io/) ecosystem. Each backend is wrapped as a scikit-learn-compatible Yohou forecaster with full support for `fit`, `predict`, `observe`, and `rewind`, so you can use classical statistical models and deep learning architectures through a single unified API.
 
