@@ -325,7 +325,7 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
         X_wide = dict_to_panel(X_t)
 
         # 3. Store original column names for reconstruction
-        assert y_wide is not None, "y_wide must not be None after _pre_fit"
+        assert y_wide is not None, "y_wide must not be None after _pre_fit"  # noqa: S101  # type-narrowing for the type checker
         self.y_columns_ = [c for c in y_wide.columns if c != "time"]
 
         # 4. Infer frequency
@@ -516,8 +516,8 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
             return pl.concat([y_pred_inv.select("time"), value_cols], how="horizontal")
 
         # Panel data: per-group inverse transform
-        assert isinstance(self.target_transformer_, dict)
-        assert isinstance(self._y_observed, dict)
+        assert isinstance(self.target_transformer_, dict)  # noqa: S101  # type-narrowing for the type checker
+        assert isinstance(self._y_observed, dict)  # noqa: S101  # type-narrowing for the type checker
         inv_parts: list[pl.DataFrame] = []
         for group_name in self.groups_:
             group_cols = [c for c in y_pred.columns if c.startswith(f"{group_name}__")]
