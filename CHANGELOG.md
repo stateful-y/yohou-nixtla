@@ -6,6 +6,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.1.0-alpha.6] - 2026-08-12
+
+This **minor release** includes 21 commits.
+
+
+### Bug Fixes
+- Pin exact uv version in setup-uv steps (template v0.29.6)  ([#46](https://github.com/stateful-y/yohou-nixtla/pull/46)) by @gtauzin
+- Pin ossf/scorecard-action to v2.4.4 (@v2 tag does not exist) by @gtauzin
+- Pin the nightly Codecov upload and check every upload, not just one  ([#64](https://github.com/stateful-y/yohou-nixtla/pull/64)) by @gtauzin
+- Unblock PyPI publishing and split the nightly matrix by version  ([#68](https://github.com/stateful-y/yohou-nixtla/pull/68)) by @gtauzin
+
+### Refactoring
+- Move build output to .artifacts/, config into .github/  ([#63](https://github.com/stateful-y/yohou-nixtla/pull/63)) by @gtauzin
+
+### Testing
+- Isolate lightning_logs per test to fix xdist race  ([#36](https://github.com/stateful-y/yohou-nixtla/pull/36)) by @gtauzin
+
+### Miscellaneous Tasks
+- Update from template v0.27.0 to v0.27.3  ([#37](https://github.com/stateful-y/yohou-nixtla/pull/37)) by @gtauzin
+- Update from template v0.27.3 to v0.28.1  ([#40](https://github.com/stateful-y/yohou-nixtla/pull/40)) by @gtauzin
+- Update from template v0.28.1 to v0.28.3  ([#42](https://github.com/stateful-y/yohou-nixtla/pull/42)) by @gtauzin
+- Update from template v0.28.3 to v0.28.4  ([#43](https://github.com/stateful-y/yohou-nixtla/pull/43)) by @gtauzin
+- Update from template v0.28.4 to v0.29.3  ([#44](https://github.com/stateful-y/yohou-nixtla/pull/44)) by @gtauzin
+- Update to python-package-copier v0.30.1 (MkDocs to Zensical)  ([#47](https://github.com/stateful-y/yohou-nixtla/pull/47)) by @gtauzin
+- Update to v0.32.1 (pre-push gates + CI roll-up)  ([#50](https://github.com/stateful-y/yohou-nixtla/pull/50)) by @gtauzin
+- Sync to v0.35.0  ([#51](https://github.com/stateful-y/yohou-nixtla/pull/51)) by @gtauzin
+- Sync to v0.36.0 (Codecov OIDC + scorecard pin)  ([#52](https://github.com/stateful-y/yohou-nixtla/pull/52)) by @gtauzin
+- Sync to v0.37.0 (gitsign tag-signing docs)  ([#53](https://github.com/stateful-y/yohou-nixtla/pull/53)) by @gtauzin
+- Update from python-package-copier v0.38.0  ([#54](https://github.com/stateful-y/yohou-nixtla/pull/54)) by @gtauzin
+- Update from template v0.39.0  ([#55](https://github.com/stateful-y/yohou-nixtla/pull/55)) by @gtauzin
+- Update from template v0.39.1  ([#56](https://github.com/stateful-y/yohou-nixtla/pull/56)) by @gtauzin
+- Update from template v0.40.0  ([#57](https://github.com/stateful-y/yohou-nixtla/pull/57)) by @gtauzin
+- Update from template v0.40.1  ([#62](https://github.com/stateful-y/yohou-nixtla/pull/62)) by @gtauzin
+
+### Contributors
+
+Thanks to all contributors for this release:
+- @gtauzin
+
 ## [0.1.0-alpha.5] - 2026-07-20
 
 This **minor release** includes 6 commits and one breaking API change.
