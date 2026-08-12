@@ -141,6 +141,25 @@ For questions and discussions, you can also open a [discussion](https://github.c
 
 This project is licensed under the terms of the [Apache-2.0 License](https://github.com/stateful-y/yohou-nixtla/blob/main/LICENSE).
 
+## How do I cite Yohou-Nixtla?
+
+If you use Yohou-Nixtla in work you publish, please cite it:
+
+Guillaume Tauzin. Yohou-Nixtla. https://github.com/stateful-y/yohou-nixtla
+
+Or in BibTeX:
+
+```bibtex
+@software{yohou_nixtla,
+  author  = "Guillaume Tauzin",
+  title   = "{Yohou-Nixtla}",
+  url     = "https://github.com/stateful-y/yohou-nixtla",
+  license = "Apache-2.0"
+}
+```
+
+Reference managers can read [CITATION.cff](https://github.com/stateful-y/yohou-nixtla/blob/main/CITATION.cff) directly. To cite a specific version, see the [citation page](https://yohou-nixtla.readthedocs.io/en/latest/pages/reference/citation/).
+
 ## Acknowledgements
 
 This project is maintained by [stateful-y](https://stateful-y.io), an ML consultancy specializing in time series data science & engineering. If you're interested in collaborating or learning more about our services, please visit our website.
