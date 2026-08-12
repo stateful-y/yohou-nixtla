@@ -6,6 +6,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.1.0-alpha.6] - 2026-08-12
+
+This **minor release** includes 21 commits.
+
+
+### Bug Fixes
+- Pin exact uv version in setup-uv steps (template v0.29.6)  ([#46](https://github.com/stateful-y/yohou-nixtla/pull/46)) by @gtauzin
+- Pin ossf/scorecard-action to the existing v2.4.4 tag by @gtauzin
+- Stop the nightly coverage upload from silently uploading the wrong report  ([#64](https://github.com/stateful-y/yohou-nixtla/pull/64)) by @gtauzin
+- Unblock PyPI publishing and split the nightly matrix by version  ([#68](https://github.com/stateful-y/yohou-nixtla/pull/68)) by @gtauzin
+
+### Refactoring
+- Move build output to .artifacts/, config into .github/  ([#63](https://github.com/stateful-y/yohou-nixtla/pull/63)) by @gtauzin
+
+### Testing
+- Isolate lightning_logs per test to fix xdist race  ([#36](https://github.com/stateful-y/yohou-nixtla/pull/36)) by @gtauzin
+
+### Miscellaneous Tasks
+- Move the docs build out of hooks.py and widen the ruff ignores (template v0.27.3)  ([#37](https://github.com/stateful-y/yohou-nixtla/pull/37)) by @gtauzin
+- Render API page structure from mkdocstrings templates (template v0.28.1)  ([#40](https://github.com/stateful-y/yohou-nixtla/pull/40)) by @gtauzin
+- Discover the API surface with Griffe (template v0.28.3)  ([#42](https://github.com/stateful-y/yohou-nixtla/pull/42)) by @gtauzin
+- Replace stale git hooks by installing with prek install -f (template v0.28.4)  ([#43](https://github.com/stateful-y/yohou-nixtla/pull/43)) by @gtauzin
+- Make the generated docs build engine-independent (template v0.29.3)  ([#44](https://github.com/stateful-y/yohou-nixtla/pull/44)) by @gtauzin
+- Migrate the docs engine from MkDocs to Zensical (template v0.30.1)  ([#47](https://github.com/stateful-y/yohou-nixtla/pull/47)) by @gtauzin
+- Add pre-push gates and a single CI roll-up check (template v0.32.1)  ([#50](https://github.com/stateful-y/yohou-nixtla/pull/50)) by @gtauzin
+- Restrict workflow permissions and add secret scanning (template v0.35.0)  ([#51](https://github.com/stateful-y/yohou-nixtla/pull/51)) by @gtauzin
+- Switch Codecov to OIDC and pin the Scorecard action (template v0.36.0)  ([#52](https://github.com/stateful-y/yohou-nixtla/pull/52)) by @gtauzin
+- Document signing release tags with gitsign (template v0.37.0)  ([#53](https://github.com/stateful-y/yohou-nixtla/pull/53)) by @gtauzin
+- Add a CLAUDE.md project-instructions file for AI assistants (template v0.38.0)  ([#54](https://github.com/stateful-y/yohou-nixtla/pull/54)) by @gtauzin
+- Fix three release-pipeline defects (template v0.39.0)  ([#55](https://github.com/stateful-y/yohou-nixtla/pull/55)) by @gtauzin
+- Let Renovate see the SBOM tool's version pin (template v0.39.1)  ([#56](https://github.com/stateful-y/yohou-nixtla/pull/56)) by @gtauzin
+- Add a nightly job that exercises the release path (template v0.40.0)  ([#57](https://github.com/stateful-y/yohou-nixtla/pull/57)) by @gtauzin
+- Fix a shell injection in the release publish job (template v0.40.1)  ([#62](https://github.com/stateful-y/yohou-nixtla/pull/62)) by @gtauzin
+
+### Contributors
+
+Thanks to all contributors for this release:
+- @gtauzin
+
 ## [0.1.0-alpha.5] - 2026-07-20
 
 This **minor release** includes 6 commits and one breaking API change.
