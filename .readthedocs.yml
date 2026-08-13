@@ -27,8 +27,9 @@ build:
     # environment lean: only the docs group and the project, never the examples
     # (marimo/notebook) dependencies, which the published site does not need.
     - asdf plugin add uv || true
-    - asdf install uv latest
-    - asdf global uv latest
+    # renovate: datasource=github-releases depName=astral-sh/uv
+    - asdf install uv 0.10.0
+    - asdf global uv 0.10.0
     - uv sync --no-default-groups --group docs --no-group examples
     # Generate the API pages and export the notebooks -- the explicit step that
     # replaced the deleted on_pre_build hook.
