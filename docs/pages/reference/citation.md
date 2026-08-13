@@ -8,14 +8,14 @@ If you use Yohou-Nixtla in work you publish, please cite it.
 
 ## Plain text
 
-Guillaume Tauzin. Yohou-Nixtla. https://github.com/stateful-y/yohou-nixtla
+Guillaume Tauzin. Yohou-Nixtla: A Nixtla integration for Yohou. https://github.com/stateful-y/yohou-nixtla
 
 ## BibTeX
 
 ```bibtex
 @software{yohou_nixtla,
   author  = "Guillaume Tauzin",
-  title   = "{Yohou-Nixtla}",
+  title   = "{Yohou-Nixtla: A Nixtla integration for Yohou}",
   url     = "https://github.com/stateful-y/yohou-nixtla",
   license = "Apache-2.0"
 }

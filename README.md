@@ -145,14 +145,14 @@ This project is licensed under the terms of the [Apache-2.0 License](https://git
 
 If you use Yohou-Nixtla in work you publish, please cite it:
 
-Guillaume Tauzin. Yohou-Nixtla. https://github.com/stateful-y/yohou-nixtla
+Guillaume Tauzin. Yohou-Nixtla: A Nixtla integration for Yohou. https://github.com/stateful-y/yohou-nixtla
 
 Or in BibTeX:
 
 ```bibtex
 @software{yohou_nixtla,
   author  = "Guillaume Tauzin",
-  title   = "{Yohou-Nixtla}",
+  title   = "{Yohou-Nixtla: A Nixtla integration for Yohou}",
   url     = "https://github.com/stateful-y/yohou-nixtla",
   license = "Apache-2.0"
 }
