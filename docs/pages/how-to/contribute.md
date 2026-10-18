@@ -262,10 +262,12 @@ Example:
 ```python
 import pytest
 
+
 @pytest.mark.slow
 def test_large_computation():
     # Long-running test
     pass
+
 
 @pytest.mark.integration
 @pytest.mark.slow
