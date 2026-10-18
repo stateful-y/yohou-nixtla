@@ -555,13 +555,22 @@ class BaseNixtlaForecaster(BaseClassWrapper, BasePointForecaster, metaclass=abc.
 
         return pl.concat([y_pred.select("time"), value_cols], how="horizontal")
 
-    def _predict(self, groups: list[str], **params) -> tuple[pl.DataFrame, pl.DataFrame]:
+    def _predict(
+        self,
+        groups: list[str],
+        y_pred_step: pl.DataFrame | None = None,
+        **params,
+    ) -> tuple[pl.DataFrame, pl.DataFrame]:
         """Generate predictions for the fitted forecasting horizon.
 
         Parameters
         ----------
         groups : list of str
             Panel groups to predict.
+        y_pred_step : pl.DataFrame or None, default=None
+            Declared to match ``BaseForecaster._predict`` and ignored: Nixtla
+            backends forecast the whole fitted horizon in one call, so there is
+            no precomputed step to reuse.
         **params : dict
             Additional metadata routing parameters.
 
